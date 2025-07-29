@@ -1,0 +1,95 @@
+import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { JwtModule } from '@nestjs/jwt';
+import { PassportModule } from '@nestjs/passport';
+
+// Controllers
+import { AppController } from './app.controller';
+
+// Services
+import { AppService } from './app.service';
+
+// Entities
+import { User } from './user/entities/user.entity';
+import { Profile } from './profile/entities/profile.entity';
+import { Meal } from './meal/entities/meal.entity';
+import { MealFood } from './meal/entities/meal-food.entity';
+import { WaterIntake } from './water/entities/water-intake.entity';
+import { Exercise } from './exercise/entities/exercise.entity';
+import { NutritionGoal } from './nutrition-goal/entities/nutrition-goal.entity';
+import { AiCache } from './ai/entities/ai-cache.entity';
+import { Food } from './food/entities/food.entity';
+import { UserFoodPreference } from './food/entities/user-food-preference.entity';
+import { DailyFoodAvailability } from './food/entities/daily-food-availability.entity';
+import { MealSuggestion } from './food/entities/meal-suggestion.entity';
+
+// Feature modules
+import { AuthModule } from './auth/auth.module';
+import { UserModule } from './user/user.module';
+import { ProfileModule } from './profile/profile.module';
+import { MealModule } from './meal/meal.module';
+import { WaterModule } from './water/water.module';
+import { ExerciseModule } from './exercise/exercise.module';
+import { NutritionGoalModule } from './nutrition-goal/nutrition-goal.module';
+import { EmailModule } from './email/email.module';
+import { DashboardModule } from './dashboard/dashboard.module';
+import { AiModule } from './ai/ai.module';
+import { FoodModule } from './food/food.module';
+
+@Module({
+  imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: '.env',
+      cache: true,
+    }),
+    TypeOrmModule.forRoot({
+      type: 'postgres',
+      host: process.env.DATABASE_HOST || 'localhost',
+      port: parseInt(process.env.DATABASE_PORT || '5432', 10),
+      username: process.env.DATABASE_USERNAME || 'postgres',
+      password: process.env.DATABASE_PASSWORD || 'password',
+      database: process.env.DATABASE_NAME || 'nutriwise',
+      entities: [
+        User, 
+        Profile, 
+        Meal, 
+        MealFood, 
+        WaterIntake, 
+        Exercise, 
+        NutritionGoal, 
+        AiCache,
+        Food,
+        UserFoodPreference,
+        DailyFoodAvailability,
+        MealSuggestion,
+      ],
+      synchronize: true,
+      logging: process.env.DEBUG_DATABASE === 'true',
+    }),
+    JwtModule.register({
+      secret: process.env.JWT_SECRET || 'your-secret-key',
+      signOptions: {
+        expiresIn: process.env.JWT_EXPIRATION_TIME || '1h'
+      },
+    }),
+    PassportModule,
+
+    // Feature modules
+    AuthModule,
+    UserModule,
+    ProfileModule,
+    MealModule,
+    WaterModule,
+    ExerciseModule,
+    NutritionGoalModule,
+    EmailModule,
+    DashboardModule,
+    AiModule,
+    FoodModule,
+  ],
+  controllers: [AppController],
+  providers: [AppService],
+})
+export class AppModule {} 
