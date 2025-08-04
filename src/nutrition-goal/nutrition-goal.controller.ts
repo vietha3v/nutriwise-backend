@@ -39,7 +39,7 @@ export class NutritionGoalController {
   @ApiResponse({ status: 200, description: 'List of nutrition goals' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   findAll(@Request() req) {
-    return this.nutritionGoalService.findAll();
+    return this.nutritionGoalService.findAll(req.user.userId);
   }
 
   @Get('personal')
@@ -47,7 +47,7 @@ export class NutritionGoalController {
   @ApiResponse({ status: 200, description: 'Personal nutrition goals and progress' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   getPersonalGoals(@Request() req) {
-    return this.nutritionGoalService.getPersonalGoals(req.user.userId);
+    return this.nutritionGoalService.calculatePersonalizedGoals(req.user.userId);
   }
 
   @Get(':id')
@@ -55,8 +55,8 @@ export class NutritionGoalController {
   @ApiResponse({ status: 200, description: 'Nutrition goal found' })
   @ApiResponse({ status: 404, description: 'Nutrition goal not found' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  findOne(@Param('id') id: string) {
-    return this.nutritionGoalService.findOne(+id);
+  findOne(@Param('id') id: string, @Request() req) {
+    return this.nutritionGoalService.findOne(+id, req.user.userId);
   }
 
   @Patch(':id')
@@ -64,8 +64,8 @@ export class NutritionGoalController {
   @ApiResponse({ status: 200, description: 'Nutrition goal updated successfully' })
   @ApiResponse({ status: 404, description: 'Nutrition goal not found' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  update(@Param('id') id: string, @Body() updateNutritionGoalDto: any) {
-    return this.nutritionGoalService.update(+id, updateNutritionGoalDto);
+  update(@Param('id') id: string, @Body() updateNutritionGoalDto: any, @Request() req) {
+    return this.nutritionGoalService.update(+id, updateNutritionGoalDto, req.user.userId);
   }
 
   @Delete(':id')
@@ -73,7 +73,7 @@ export class NutritionGoalController {
   @ApiResponse({ status: 200, description: 'Nutrition goal deleted successfully' })
   @ApiResponse({ status: 404, description: 'Nutrition goal not found' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  remove(@Param('id') id: string) {
-    return this.nutritionGoalService.remove(+id);
+  remove(@Param('id') id: string, @Request() req) {
+    return this.nutritionGoalService.remove(+id, req.user.userId);
   }
 } 

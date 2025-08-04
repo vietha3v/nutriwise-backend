@@ -154,8 +154,8 @@ export class UserController {
     description: 'Không có quyền Admin'
   })
   @Roles(Role.SystemAdmin)
-  findAll(@Query() query: any) {
-    return this.userService.findAll(query);
+  findAll() {
+    return this.userService.findAll();
   }
 
   @Get(':id')

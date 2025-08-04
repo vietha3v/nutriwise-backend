@@ -6,6 +6,7 @@ import { Food } from './entities/food.entity';
 import { UserFoodPreference } from './entities/user-food-preference.entity';
 import { DailyFoodAvailability } from './entities/daily-food-availability.entity';
 import { MealSuggestion } from './entities/meal-suggestion.entity';
+import { ProfileModule } from 'src/profile/profile.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { MealSuggestion } from './entities/meal-suggestion.entity';
       DailyFoodAvailability,
       MealSuggestion,
     ]),
+    ProfileModule
   ],
   controllers: [FoodController],
   providers: [FoodService],
