@@ -44,7 +44,34 @@ async function bootstrap() {
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document);
+  
+  // Custom Swagger UI options to auto-load token from env or localStorage
+  const customOptions = {
+    swaggerOptions: {
+      persistAuthorization: true,
+      requestInterceptor: (req: any) => {
+        // Auto-add Bearer prefix if not present
+        if (req.headers.Authorization && !req.headers.Authorization.startsWith('Bearer ')) {
+          req.headers.Authorization = `Bearer ${req.headers.Authorization}`;
+        }
+        return req;
+      },
+    },
+    customJs: `
+      // Auto-fill token from localStorage or env
+      window.onload = function() {
+        const token = localStorage.getItem('jwt_token') || '${process.env.SWAGGER_DEFAULT_TOKEN || ''}';
+        if (token) {
+          const authInput = document.querySelector('input[placeholder*="JWT"]');
+          if (authInput) {
+            authInput.value = token;
+          }
+        }
+      };
+    `,
+  };
+
+  SwaggerModule.setup('api', app, document, customOptions);
 
   const port = process.env.PORT || 3001;
   await app.listen(port);

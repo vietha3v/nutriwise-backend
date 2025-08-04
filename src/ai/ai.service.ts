@@ -488,7 +488,7 @@ export class AiService {
       height: profile.height,
       activityLevel: profile.activityLevel,
       goalType: profile.goalType,
-      dietaryRestrictions: profile.dietaryRestrictions,
+      dietaryRestrictions: profile.allergies,
     };
 
     // Check cache first (unless force refresh)
@@ -506,7 +506,7 @@ export class AiService {
         - Chiều cao: ${profile.height}cm
         - Mức độ hoạt động: ${profile.activityLevel}
         - Mục tiêu: ${profile.goalType}
-        - Hạn chế ăn uống: ${profile.dietaryRestrictions || 'Không có'}
+        - Hạn chế ăn uống: ${profile.allergies || 'Không có'}
         
         Trả về một đối tượng JSON với:
         {
@@ -601,7 +601,7 @@ export class AiService {
 - Cân nặng: ${profile.weight}kg
 - Chiều cao: ${profile.height}cm
 - Mục tiêu: ${profile.goalType}
-- Hạn chế ăn uống: ${profile.dietaryRestrictions || 'Không có'}
+- Hạn chế ăn uống: ${profile.allergies || 'Không có'}
 
 **Thực phẩm có sẵn:**
 ${availableFoods.map(food => `- ${food.foodName}: ${food.quantity} ${food.unit}`).join('\n')}

@@ -138,8 +138,8 @@ export class User {
   updatedAt: Date;
 
   // Relations - sử dụng string để tránh circular dependency
-  @OneToOne('Profile', 'user')
-  profile: any;
+  @OneToMany('Profile', 'user')
+  profiles: any[];
 
   @OneToMany('Meal', 'user')
   meals: any[];
