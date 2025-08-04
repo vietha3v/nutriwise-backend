@@ -4,23 +4,39 @@ import { Role } from '../../common/enums/role.enum';
 
 @Entity('users')
 export class User {
-  @ApiProperty({ description: 'Unique identifier' })
+  @ApiProperty({ 
+    description: 'ID duy nhất của người dùng',
+    example: 1
+  })
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ApiProperty({ description: 'Username' })
+  @ApiProperty({ 
+    description: 'Tên đăng nhập (unique)',
+    example: 'john_doe'
+  })
   @Column({ unique: true })
   username: string;
 
-  @ApiProperty({ description: 'Email address' })
+  @ApiProperty({ 
+    description: 'Địa chỉ email (unique)',
+    example: 'john.doe@example.com'
+  })
   @Column({ unique: true })
   email: string;
 
-  @ApiProperty({ description: 'Hashed password' })
+  @ApiProperty({ 
+    description: 'Mật khẩu đã mã hóa',
+    example: '$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewdBPj4J/HS.i8eO'
+  })
   @Column()
   password: string;
 
-  @ApiProperty({ enum: Role, description: 'User role' })
+  @ApiProperty({ 
+    enum: Role, 
+    description: 'Vai trò người dùng',
+    example: Role.User
+  })
   @Column({
     type: 'enum',
     enum: Role,
@@ -28,52 +44,96 @@ export class User {
   })
   role: Role;
 
-  @ApiProperty({ description: 'Whether user is verified' })
+  @ApiProperty({ 
+    description: 'Trạng thái xác thực tài khoản',
+    example: false
+  })
   @Column({ default: false })
   isVerified: boolean;
 
-  @ApiProperty({ description: 'Password reset token' })
+  @ApiProperty({ 
+    description: 'Token reset mật khẩu',
+    example: 'reset_token_123456',
+    nullable: true
+  })
   @Column({ nullable: true })
   resetPasswordToken: string;
 
-  @ApiProperty({ description: 'Password reset token expiry' })
+  @ApiProperty({ 
+    description: 'Thời gian hết hạn token reset mật khẩu',
+    example: '2024-01-01T12:00:00.000Z',
+    nullable: true
+  })
   @Column({ nullable: true })
   resetPasswordExpires: Date;
 
   // Social login fields
-  @ApiProperty({ description: 'Google ID for OAuth', required: false })
+  @ApiProperty({ 
+    description: 'ID từ Google OAuth',
+    example: '123456789',
+    nullable: true
+  })
   @Column({ nullable: true, unique: true })
   googleId: string;
 
-  @ApiProperty({ description: 'Facebook ID for OAuth', required: false })
+  @ApiProperty({ 
+    description: 'ID từ Facebook OAuth',
+    example: '987654321',
+    nullable: true
+  })
   @Column({ nullable: true, unique: true })
   facebookId: string;
 
-  @ApiProperty({ description: 'Profile picture URL', required: false })
+  @ApiProperty({ 
+    description: 'URL ảnh đại diện',
+    example: 'https://example.com/avatar.jpg',
+    nullable: true
+  })
   @Column({ nullable: true })
   profilePicture: string;
 
-  @ApiProperty({ description: 'User display name', required: false })
+  @ApiProperty({ 
+    description: 'Tên hiển thị',
+    example: 'John Doe',
+    nullable: true
+  })
   @Column({ nullable: true })
   displayName: string;
 
-  @ApiProperty({ description: 'User locale', required: false })
+  @ApiProperty({ 
+    description: 'Ngôn ngữ',
+    example: 'vi',
+    nullable: true
+  })
   @Column({ nullable: true })
   locale: string;
 
-  @ApiProperty({ description: 'User timezone', required: false })
+  @ApiProperty({ 
+    description: 'Múi giờ',
+    example: 'Asia/Ho_Chi_Minh',
+    nullable: true
+  })
   @Column({ nullable: true })
   timezone: string;
 
-  @ApiProperty({ description: 'Whether user is deleted' })
+  @ApiProperty({ 
+    description: 'Trạng thái xóa mềm',
+    example: false
+  })
   @Column({ default: false })
   isDeleted: boolean;
 
-  @ApiProperty({ description: 'Creation timestamp' })
+  @ApiProperty({ 
+    description: 'Thời gian tạo tài khoản',
+    example: '2024-01-01T00:00:00.000Z'
+  })
   @CreateDateColumn()
   createdAt: Date;
 
-  @ApiProperty({ description: 'Last update timestamp' })
+  @ApiProperty({ 
+    description: 'Thời gian cập nhật cuối',
+    example: '2024-01-01T12:00:00.000Z'
+  })
   @UpdateDateColumn()
   updatedAt: Date;
 
