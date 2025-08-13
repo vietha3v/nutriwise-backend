@@ -4,7 +4,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { Role } from '../common/enums/role.enum';
-import { AiService, ExerciseGoals, NutritionGoals, ProgressAnalysis, WeeklyMealPlan, SmartMealSuggestion } from './ai.service';
+import { AiService, ExerciseGoals, NutritionGoals, ProgressAnalysis, WeeklyMealPlan, SmartMealSuggestion, SuggestedGoals } from './ai.service';
 
 @ApiTags('AI')
 @Controller('ai')
@@ -12,6 +12,136 @@ import { AiService, ExerciseGoals, NutritionGoals, ProgressAnalysis, WeeklyMealP
 @ApiBearerAuth()
 export class AiController {
   constructor(private readonly aiService: AiService) {}
+
+  @Get('analyze-profile')
+  @ApiOperation({ 
+    summary: 'Phân tích profile người dùng',
+    description: 'Phân tích các chỉ số sức khỏe hiện tại, đánh giá tình trạng và so sánh với tiêu chuẩn'
+  })
+  @ApiQuery({ 
+    name: 'forceRefresh', 
+    required: false, 
+    type: Boolean, 
+    description: 'Buộc làm mới cache (mặc định: false)' 
+  })
+  @ApiResponse({ 
+    status: 200, 
+    description: 'Phân tích profile thành công',
+    schema: {
+      type: 'object',
+      properties: {
+        healthAssessment: {
+          type: 'object',
+          properties: {
+            overallHealth: { type: 'string', enum: ['GOOD', 'AVERAGE', 'NEEDS_IMPROVEMENT'] },
+            bodyType: { type: 'string', enum: ['ECTOMORPH', 'MESOMORPH', 'ENDOMORPH'] },
+            healthScore: { type: 'number' },
+            weightAnalysis: { type: 'object' },
+            bodyFatAnalysis: { type: 'object' },
+            muscleAnalysis: { type: 'object' },
+            visceralFatAnalysis: { type: 'object' }
+          }
+        },
+        comparisonWithStandards: {
+          type: 'object',
+          properties: {
+            ageGroup: { type: 'string' },
+            genderGroup: { type: 'string' },
+            percentile: { type: 'number' },
+            ranking: { type: 'string', enum: ['BOTTOM_25%', '25-50%', '50-75%', 'TOP_25%'] }
+          }
+        },
+        healthIssues: {
+          type: 'object',
+          properties: {
+            immediate: { type: 'array', items: { type: 'string' } },
+            longTerm: { type: 'array', items: { type: 'string' } },
+            recommendations: { type: 'array', items: { type: 'string' } }
+          }
+        }
+      }
+    }
+  })
+  @ApiResponse({ status: 401, description: 'Không được phép' })
+  @ApiResponse({ status: 404, description: 'Không tìm thấy hồ sơ người dùng' })
+  async analyzeProfile(
+    @Request() req,
+    @Query('forceRefresh') forceRefresh?: boolean,
+  ): Promise<any> {
+    return this.aiService.analyzeProfile(req.user.userId, forceRefresh);
+  }
+
+  @Get('suggested-goals')
+  @ApiOperation({ 
+    summary: 'Lấy gợi ý mục tiêu (dinh dưỡng + tập luyện + lối sống)',
+    description: 'Dựa trên phân tích profile để đưa ra các gợi ý mục tiêu phù hợp bao gồm dinh dưỡng, tập luyện và lối sống'
+  })
+  @ApiQuery({ 
+    name: 'forceRefresh', 
+    required: false, 
+    type: Boolean, 
+    description: 'Buộc làm mới cache (mặc định: false)' 
+  })
+  @ApiResponse({ 
+    status: 200, 
+    description: 'Lấy gợi ý mục tiêu thành công',
+    schema: {
+      type: 'object',
+      properties: {
+        healthAssessment: {
+          type: 'object',
+          properties: {
+            overallHealth: { type: 'string', enum: ['GOOD', 'AVERAGE', 'NEEDS_IMPROVEMENT'] },
+            bodyType: { type: 'string', enum: ['ECTOMORPH', 'MESOMORPH', 'ENDOMORPH'] },
+            healthScore: { type: 'number' },
+            weightAnalysis: { type: 'object' },
+            bodyFatAnalysis: { type: 'object' },
+            muscleAnalysis: { type: 'object' },
+            visceralFatAnalysis: { type: 'object' }
+          }
+        },
+        suggestedGoals: {
+          type: 'array',
+          items: {
+            type: 'object',
+            properties: {
+              id: { type: 'string' },
+              name: { type: 'string' },
+              goalType: { type: 'string', enum: ['LOSE_WEIGHT', 'MAINTAIN_WEIGHT', 'GAIN_WEIGHT', 'BUILD_MUSCLE', 'IMPROVE_HEALTH'] },
+              description: { type: 'string' },
+              priority: { type: 'number' },
+              estimatedDuration: { type: 'number' },
+              difficulty: { type: 'string', enum: ['EASY', 'MEDIUM', 'HARD'] },
+              successRate: { type: 'number' },
+              targets: { type: 'object' },
+              nutritionPlan: { type: 'object' },
+              exercisePlan: { type: 'object' },
+              reasoning: { type: 'object' },
+              warnings: { type: 'array', items: { type: 'string' } },
+              notes: { type: 'array', items: { type: 'string' } }
+            }
+          }
+        },
+        summary: {
+          type: 'object',
+          properties: {
+            totalSuggestions: { type: 'number' },
+            primaryGoal: { type: 'string' },
+            estimatedTimeline: { type: 'string' },
+            overallSuccessRate: { type: 'number' }
+          }
+        }
+      }
+    }
+  })
+  @ApiResponse({ status: 401, description: 'Không được phép' })
+  @ApiResponse({ status: 404, description: 'Không tìm thấy hồ sơ người dùng' })
+  async getSuggestedGoals(
+    @Request() req,
+    @Query('forceRefresh') forceRefresh?: boolean,
+  ): Promise<SuggestedGoals> {
+    return this.aiService.getSuggestedGoals(req.user.userId, forceRefresh);
+  }
 
   @Get('exercise-goals')
   @ApiOperation({ summary: 'Lấy mục tiêu tập luyện cá nhân hóa' })
@@ -68,7 +198,12 @@ export class AiController {
   @Get('smart-meal-suggestion/:mealType')
   @ApiOperation({ summary: 'Tạo gợi ý bữa ăn thông minh dựa trên thực phẩm có sẵn' })
   @ApiParam({ name: 'mealType', description: 'Loại bữa ăn (breakfast, lunch, dinner, snack)' })
-  @ApiQuery({ name: 'date', description: 'Ngày (YYYY-MM-DD)', required: false })
+  @ApiQuery({ 
+    name: 'date', 
+    description: 'Ngày (YYYY-MM-DD)', 
+    required: false,
+    example: new Date().toISOString().split('T')[0]
+  })
   @ApiQuery({ name: 'forceRefresh', required: false, type: Boolean, description: 'Buộc làm mới cache' })
   @ApiResponse({ status: 200, description: 'Tạo gợi ý bữa ăn thành công', type: Object })
   @ApiResponse({ status: 401, description: 'Không được phép' })

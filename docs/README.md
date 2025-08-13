@@ -21,7 +21,7 @@
 ### 🍽️ Dinh dưỡng & Bữa ăn
 - [4. Quản lý bữa ăn](./04-meal-management.md) - Ghi lại bữa ăn, tính toán dinh dưỡng
 - [5. Theo dõi lượng nước](./05-water-tracking.md) - Ghi lại lượng nước uống, mục tiêu nước
-- [7. Mục tiêu dinh dưỡng](./07-nutrition-goals.md) - Thiết lập và theo dõi mục tiêu
+- [7. Mục tiêu](./07-goals.md) - Thiết lập và theo dõi mục tiêu
 
 ### 💪 Tập luyện & Sức khỏe
 - [6. Quản lý tập luyện](./06-exercise-management.md) - Ghi lại bài tập, tính calo đốt cháy
@@ -30,7 +30,8 @@
 - [8. Dashboard và thống kê](./08-dashboard.md) - Tổng quan, biểu đồ, báo cáo
 
 ### 🤖 AI & Tư vấn
-- [9. AI Personal Trainer & Nutritionist](./09-ai-personal-trainer.md) - AI tạo kế hoạch dinh dưỡng và tập luyện
+- [9. AI Personal Trainer & Nutritionist](./09-ai-personal-trainer.md) - AI phân tích profile và gợi ý mục tiêu
+- [13. AI Assistant - Trợ lý ảo](./13-ai-assistant.md) - Chatbot tư vấn dinh dưỡng, hỗ trợ người dùng
 
 ### 📧 Thông báo
 - [10. Gửi email](./10-email.md) - Hệ thống gửi email tự động
@@ -75,12 +76,13 @@ docs/
 ├── 04-meal-management.md        # Module 4: Quản lý bữa ăn
 ├── 05-water-tracking.md         # Module 5: Theo dõi lượng nước
 ├── 06-exercise-management.md    # Module 6: Quản lý tập luyện
-├── 07-nutrition-goals.md        # Module 7: Mục tiêu dinh dưỡng
+├── 07-goals.md                  # Module 7: Mục tiêu
 ├── 08-dashboard.md              # Module 8: Dashboard và thống kê
 ├── 09-ai-personal-trainer.md    # Module 9: AI Personal Trainer
 ├── 10-email.md                  # Module 10: Gửi email
 ├── 11-trainer-relationship.md   # Module 11: Trainer-User Relationship
-└── 12-wallet-payment.md         # Module 12: Wallet & Payment
+├── 12-wallet-payment.md         # Module 12: Wallet & Payment
+└── 13-ai-assistant.md           # Module 13: AI Assistant - Trợ lý ảo
 ```
 
 ## 🔗 Liên kết với code

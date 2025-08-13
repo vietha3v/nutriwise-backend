@@ -17,8 +17,12 @@ import { Meal } from './meal/entities/meal.entity';
 import { MealFood } from './meal/entities/meal-food.entity';
 import { WaterIntake } from './water/entities/water-intake.entity';
 import { Exercise } from './exercise/entities/exercise.entity';
-import { NutritionGoal } from './nutrition-goal/entities/nutrition-goal.entity';
+import { Goal } from './goals/entities/goal.entity';
+
 import { AiCache } from './ai/entities/ai-cache.entity';
+import { UserPlatform } from './ai-assistant/entities/user-platform.entity';
+import { VerificationSession } from './ai-assistant/entities/verification-session.entity';
+import { ChatMessage } from './ai-assistant/entities/chat-message.entity';
 import { Food } from './food/entities/food.entity';
 import { UserFoodPreference } from './food/entities/user-food-preference.entity';
 import { DailyFoodAvailability } from './food/entities/daily-food-availability.entity';
@@ -31,10 +35,12 @@ import { ProfileModule } from './profile/profile.module';
 import { MealModule } from './meal/meal.module';
 import { WaterModule } from './water/water.module';
 import { ExerciseModule } from './exercise/exercise.module';
-import { NutritionGoalModule } from './nutrition-goal/nutrition-goal.module';
+import { GoalsModule } from './goals/goals.module';
+
 import { EmailModule } from './email/email.module';
 import { DashboardModule } from './dashboard/dashboard.module';
 import { AiModule } from './ai/ai.module';
+import { AiAssistantModule } from './ai-assistant/ai-assistant.module';
 import { FoodModule } from './food/food.module';
 
 @Module({
@@ -58,8 +64,12 @@ import { FoodModule } from './food/food.module';
         MealFood, 
         WaterIntake, 
         Exercise, 
-        NutritionGoal, 
+        Goal,
+
         AiCache,
+        UserPlatform,
+        VerificationSession,
+        ChatMessage,
         Food,
         UserFoodPreference,
         DailyFoodAvailability,
@@ -83,10 +93,12 @@ import { FoodModule } from './food/food.module';
     MealModule,
     WaterModule,
     ExerciseModule,
-    NutritionGoalModule,
+    GoalsModule,
+
     EmailModule,
     DashboardModule,
     AiModule,
+    AiAssistantModule,
     FoodModule,
   ],
   controllers: [AppController],

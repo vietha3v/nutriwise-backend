@@ -6,7 +6,7 @@ import { AiCache } from './entities/ai-cache.entity';
 import { Profile } from '../profile/entities/profile.entity';
 import { Meal } from '../meal/entities/meal.entity';
 import { Exercise } from '../exercise/entities/exercise.entity';
-import { NutritionGoal } from '../nutrition-goal/entities/nutrition-goal.entity';
+import { Goal } from '../goals/entities/goal.entity';
 import { FoodModule } from '../food/food.module';
 
 @Module({
@@ -16,7 +16,7 @@ import { FoodModule } from '../food/food.module';
       Profile,
       Meal,
       Exercise,
-      NutritionGoal,
+      Goal,
     ]),
     FoodModule,
   ],

@@ -3,6 +3,7 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module';
 import { GlobalDebugInterceptor } from './common/interceptors/global-debug.interceptor';
+import { DateTransformInterceptor } from './common/interceptors/date-transform.interceptor';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -19,6 +20,9 @@ async function bootstrap() {
     forbidNonWhitelisted: true,
     transform: true,
   }));
+
+  // Global date transform interceptor
+  app.useGlobalInterceptors(new DateTransformInterceptor());
 
   // Global debug interceptor (only if DEBUG_REQUESTS is true)
   if (process.env.DEBUG_REQUESTS === 'true') {
@@ -38,7 +42,7 @@ async function bootstrap() {
     .addTag('Meals', 'Meal tracking and management')
     .addTag('Water', 'Water intake tracking')
     .addTag('Exercise', 'Exercise tracking and management')
-    .addTag('Nutrition Goals', 'Nutrition goal setting and tracking')
+    .addTag('Goals', 'Goal setting and tracking (nutrition, exercise, lifestyle)')
     .addTag('Dashboard', 'Analytics and reporting')
     .addTag('OAuth', 'Social login with Google and Facebook')
     .build();
