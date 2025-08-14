@@ -150,11 +150,14 @@ export class User {
   @OneToMany('Exercise', 'user')
   exercises: any[];
 
-  @OneToMany('NutritionGoal', 'user')
-  nutritionGoals: any[];
+  @OneToMany('Goal', 'user')
+  goals: any[];
 
   @OneToMany('AiCache', 'user')
   aiCaches: any[];
+
+  @OneToMany('UserPlatform', 'user')
+  platforms: any[];
 
   // Food system relations
   @OneToMany('UserFoodPreference', 'user')

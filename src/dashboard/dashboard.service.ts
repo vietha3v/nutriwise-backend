@@ -4,7 +4,7 @@ import { Repository, Between } from 'typeorm';
 import { Meal } from '../meal/entities/meal.entity';
 import { WaterIntake } from '../water/entities/water-intake.entity';
 import { Exercise } from '../exercise/entities/exercise.entity';
-import { NutritionGoal } from '../nutrition-goal/entities/nutrition-goal.entity';
+import { Goal, GoalStatus } from '../goals/entities/goal.entity';
 
 @Injectable()
 export class DashboardService {
@@ -15,8 +15,8 @@ export class DashboardService {
     private waterIntakeRepository: Repository<WaterIntake>,
     @InjectRepository(Exercise)
     private exerciseRepository: Repository<Exercise>,
-    @InjectRepository(NutritionGoal)
-    private nutritionGoalRepository: Repository<NutritionGoal>,
+    @InjectRepository(Goal)
+    private goalRepository: Repository<Goal>,
   ) {}
 
   async getDashboardData(userId: number): Promise<any> {
@@ -51,12 +51,11 @@ export class DashboardService {
       },
     });
 
-    // Lấy mục tiêu dinh dưỡng hiện tại
-    const currentGoal = await this.nutritionGoalRepository.findOne({
+    // Lấy mục tiêu hiện tại
+    const currentGoal = await this.goalRepository.findOne({
       where: {
         userId,
-        isActive: true,
-        isDeleted: false,
+        status: GoalStatus.ACTIVE,
       },
       order: { createdAt: 'DESC' },
     });

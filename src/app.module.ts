@@ -21,7 +21,6 @@ import { Goal } from './goals/entities/goal.entity';
 
 import { AiCache } from './ai/entities/ai-cache.entity';
 import { UserPlatform } from './ai-assistant/entities/user-platform.entity';
-import { VerificationSession } from './ai-assistant/entities/verification-session.entity';
 import { ChatMessage } from './ai-assistant/entities/chat-message.entity';
 import { Food } from './food/entities/food.entity';
 import { UserFoodPreference } from './food/entities/user-food-preference.entity';
@@ -68,7 +67,6 @@ import { FoodModule } from './food/food.module';
 
         AiCache,
         UserPlatform,
-        VerificationSession,
         ChatMessage,
         Food,
         UserFoodPreference,
