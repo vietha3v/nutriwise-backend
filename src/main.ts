@@ -4,6 +4,7 @@ import { ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module';
 import { GlobalDebugInterceptor } from './common/interceptors/global-debug.interceptor';
 import { DateTransformInterceptor } from './common/interceptors/date-transform.interceptor';
+import * as cookieParser from 'cookie-parser';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -12,7 +13,11 @@ async function bootstrap() {
   app.enableCors({
     origin: process.env.FRONTEND_URL || 'http://localhost:3000',
     credentials: true,
+    exposedHeaders: ['Set-Cookie'],
   });
+
+  // Cookie parser middleware
+  app.use(cookieParser());
 
   // Global validation pipe
   app.useGlobalPipes(new ValidationPipe({

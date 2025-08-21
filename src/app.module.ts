@@ -73,13 +73,13 @@ import { FoodModule } from './food/food.module';
         DailyFoodAvailability,
         MealSuggestion,
       ],
-      synchronize: true,
+      synchronize: false,
       logging: process.env.DEBUG_DATABASE === 'true',
     }),
     JwtModule.register({
       secret: process.env.JWT_SECRET || 'your-secret-key',
       signOptions: {
-        expiresIn: process.env.JWT_EXPIRATION_TIME || '1h'
+        expiresIn: process.env.JWT_EXPIRATION_TIME || '7d'
       },
     }),
     PassportModule,

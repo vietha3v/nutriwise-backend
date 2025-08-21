@@ -109,6 +109,18 @@ export class AuthService {
     const payload = { username: user.username, sub: user.id, userId: user.id, role: user.role };
     const token = this.jwtService.sign(payload);
 
+    // Generate refresh token
+    const refreshPayload = { 
+      username: user.username, 
+      sub: user.id, 
+      userId: user.id, 
+      role: user.role,
+      type: 'refresh'
+    };
+    const refreshToken = this.jwtService.sign(refreshPayload, {
+      expiresIn: process.env.REFRESH_TOKEN_EXPIRATION_TIME || '30d'
+    });
+
     return {
       user: {
         id: user.id,
@@ -119,7 +131,8 @@ export class AuthService {
         profilePicture: user.profilePicture,
         displayName: user.displayName,
       },
-      token,
+      token, 
+      refresh_token: refreshToken
     };
   }
 
@@ -263,5 +276,63 @@ export class AuthService {
       profilePicture: user.profilePicture,
       displayName: user.displayName,
     };
+  }
+
+  async refreshToken(refreshToken: string): Promise<any> {
+    try {
+      // Verify refresh token
+      const payload = this.jwtService.verify(refreshToken);
+      
+      // Check if this is a refresh token
+      if (payload.type !== 'refresh') {
+        throw new UnauthorizedException('Invalid token type');
+      }
+
+      // Find user
+      const user = await this.userRepository.findOne({
+        where: { id: payload.userId }
+      });
+      
+      if (!user) {
+        throw new UnauthorizedException('User not found');
+      }
+
+      // Create new access token
+      const accessPayload = { 
+        username: user.username, 
+        sub: user.id, 
+        userId: user.id, 
+        role: user.role 
+      };
+      const newAccessToken = this.jwtService.sign(accessPayload);
+
+      // Generate new refresh token
+      const newRefreshPayload = { 
+        username: user.username, 
+        sub: user.id, 
+        userId: user.id, 
+        role: user.role,
+        type: 'refresh'
+      };
+      const newRefreshToken = this.jwtService.sign(newRefreshPayload, {
+        expiresIn: process.env.REFRESH_TOKEN_EXPIRATION_TIME || '30d'
+      });
+
+      return {
+        token: newAccessToken,
+        refresh_token: newRefreshToken,
+        user: {
+          id: user.id,
+          username: user.username,
+          email: user.email,
+          role: user.role,
+          isVerified: user.isVerified,
+          profilePicture: user.profilePicture,
+          displayName: user.displayName,
+        },
+      };
+    } catch (error) {
+      throw new UnauthorizedException('Invalid refresh token');
+    }
   }
 } 

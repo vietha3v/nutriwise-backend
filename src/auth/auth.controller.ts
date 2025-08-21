@@ -6,7 +6,10 @@ import {
   Request,
   Get,
   Inject,
+  UnauthorizedException,
+  Res,
 } from '@nestjs/common';
+import { Response } from 'express';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiBody } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
@@ -114,8 +117,24 @@ export class AuthController {
       }
     }
   })
-  login(@Body() loginDto: LoginDto) {
-    return this.authService.login(loginDto);
+  async login(@Body() loginDto: LoginDto, @Res() res: Response) {
+    const result = await this.authService.login(loginDto);
+    
+    // Set refresh token vào HttpOnly cookie
+    if (result.refresh_token) {
+      res.cookie('refresh_token', result.refresh_token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+        maxAge: parseInt(process.env.COOKIE_MAX_AGE || '0'), // 0 = không giới hạn
+        path: '/'
+      });
+    }
+    
+    return res.json({
+      token: result.token,
+      user: result.user
+    });
   }
 
   @Public()
@@ -332,5 +351,97 @@ export class AuthController {
       google: this.loginGoogleEnabled,
       facebook: this.loginFbEnabled,
     };
+  }
+
+  @Public()
+  @Post('refresh-token')
+  @ApiOperation({ 
+    summary: 'Làm mới JWT token',
+    description: 'Tạo JWT token mới dựa trên refresh token.'
+  })
+  @ApiResponse({ 
+    status: 200, 
+    description: 'Token mới được tạo thành công',
+    schema: {
+      example: {
+        token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
+        user: {
+          id: 1,
+          username: 'john_doe',
+          email: 'john.doe@example.com',
+          role: 'User',
+          isVerified: true
+        }
+      }
+    }
+  })
+  @ApiResponse({ 
+    status: 401, 
+    description: 'Refresh token không hợp lệ'
+  })
+  async refreshToken(@Request() req, @Res() res: Response) {
+    // Lấy refresh token từ HttpOnly cookie
+    const refreshToken = req.cookies?.refresh_token;
+    if (!refreshToken) {
+      throw new UnauthorizedException('Refresh token not provided');
+    }
+    
+    const result = await this.authService.refreshToken(refreshToken);
+    
+    // Set refresh token mới vào HttpOnly cookie
+    if (result.refresh_token) {
+      res.cookie('refresh_token', result.refresh_token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+        maxAge: parseInt(process.env.COOKIE_MAX_AGE || '0'), // 0 = không giới hạn
+        path: '/'
+      });
+    }
+    
+    // Chỉ trả về access token và user info
+    return res.json({
+      token: result.token,
+      user: result.user
+    });
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('logout')
+  @ApiOperation({ 
+    summary: 'Đăng xuất',
+    description: 'Xóa token và refresh token, đăng xuất người dùng.'
+  })
+  @ApiResponse({ 
+    status: 200, 
+    description: 'Đăng xuất thành công',
+    schema: {
+      example: {
+        message: 'Đăng xuất thành công'
+      }
+    }
+  })
+  @ApiResponse({ 
+    status: 401, 
+    description: 'Chưa đăng nhập'
+  })
+  @ApiBearerAuth()
+  logout(@Res() res: Response) {
+    // Xóa refresh token cookie
+    res.clearCookie('refresh_token', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      path: '/'
+    });
+    
+    // Xóa access token cookie nếu có
+    res.clearCookie('token', {
+      httpOnly: false,
+      sameSite: 'lax',
+      path: '/'
+    });
+    
+    return res.json({ message: 'Đăng xuất thành công' });
   }
 } 
