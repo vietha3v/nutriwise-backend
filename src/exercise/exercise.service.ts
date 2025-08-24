@@ -3,7 +3,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Exercise } from './entities/exercise.entity';
 import { Profile } from '../profile/entities/profile.entity';
-import { AiService } from '../ai/ai.service';
 
 @Injectable()
 export class ExerciseService {
@@ -12,7 +11,6 @@ export class ExerciseService {
     private exerciseRepository: Repository<Exercise>,
     @InjectRepository(Profile)
     private profileRepository: Repository<Profile>,
-    private aiService: AiService,
   ) {}
 
   async create(createExerciseDto: any): Promise<Exercise> {
@@ -56,33 +54,5 @@ export class ExerciseService {
     await this.exerciseRepository.save(exercise);
   }
 
-  async getExerciseGoals(userId: number): Promise<any> {
-    const profile = await this.profileRepository.findOne({ where: { userId } });
-    if (!profile) {
-      throw new Error('Không tìm thấy hồ sơ người dùng');
-    }
 
-    const exercises = await this.exerciseRepository.find({
-      where: { userId },
-      order: { date: 'DESC' },
-      take: 10,
-    });
-
-    return this.aiService.calculateExerciseGoals(userId);
-  }
-
-  async calculatePersonalizedGoals(userId: number): Promise<any> {
-    const profile = await this.profileRepository.findOne({ where: { userId } });
-    if (!profile) {
-      throw new Error('Không tìm thấy hồ sơ người dùng');
-    }
-
-    const exercises = await this.exerciseRepository.find({
-      where: { userId },
-      order: { date: 'DESC' },
-      take: 10,
-    });
-
-    return this.aiService.calculateExerciseGoals(userId);
-  }
 } 

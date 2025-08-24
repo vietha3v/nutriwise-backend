@@ -129,7 +129,7 @@ export class AiAssistantService {
         intent: IntentType.UNKNOWN,
         confidence,
         conversationState: 'general_chat',
-        context: {
+      context: {
           action: 'general_query'
         }
       };
@@ -137,12 +137,12 @@ export class AiAssistantService {
     
     // Xử lý trường hợp cần thu thập thêm thông tin
     if (requiredInfo && requiredInfo.missingParams && requiredInfo.missingParams.length > 0) {
-      return {
+    return {
         response: contextualResponse,
         intent: intent as IntentType,
         confidence,
-        conversationState: 'collecting_info',
-        context: {
+      conversationState: 'collecting_info',
+      context: {
           action: requiredInfo.action,
           collectedData: requiredInfo.providedParams,
           missingFields: requiredInfo.missingParams,
@@ -153,12 +153,12 @@ export class AiAssistantService {
     
     // Xử lý trường hợp cần xác nhận từ người dùng
     if (requiredInfo && this.isActionRequiringConfirmation(requiredInfo.action)) {
-      return {
+    return {
         response: contextualResponse,
         intent: intent as IntentType,
         confidence,
         conversationState: 'confirming_action',
-        context: {
+      context: {
           action: requiredInfo.action,
           collectedData: requiredInfo.providedParams,
           missingFields: []
@@ -186,16 +186,16 @@ export class AiAssistantService {
   private async executeAction(user: User, action: string, entities: any): Promise<ChatResponseDto> {
     try {
       // TODO: Triển khai các API calls thực tế dựa trên action
-      return {
+          return {
         response: `Đã thực hiện hành động ${action} thành công!`,
-        intent: IntentType.UNKNOWN,
-        confidence: 1.0,
-        conversationState: 'completed',
-        context: {
-          action: 'completed',
-          result: 'success'
-        }
-      };
+            intent: IntentType.UNKNOWN,
+            confidence: 1.0,
+            conversationState: 'completed',
+            context: {
+              action: 'completed',
+              result: 'success'
+            }
+          };
     } catch (error) {
       this.logger.error('Error executing action:', error);
       return this.generateErrorResponse('Có lỗi xảy ra khi thực hiện hành động');

@@ -16,11 +16,8 @@ export class WaterIntake {
   @Column({ type: 'decimal', precision: 10, scale: 2 })
   amount: number; // in ml
 
-  @Column({ type: 'date' })
-  date: Date;
-
-  @Column({ type: 'time' })
-  time: string;
+  @Column({ type: 'timestamp' })
+  datetime: Date;
 
   @Column({ type: 'text', nullable: true })
   notes: string;

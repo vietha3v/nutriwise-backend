@@ -2,389 +2,212 @@
 
 ## Tổng quan
 
-Module AI Assistant cung cấp khả năng tương tác thông minh với người dùng thông qua AI để hiểu ý định và thực hiện các hành động trong hệ thống NutriWise.
+Module AI Assistant là trợ lý thông minh tích hợp trong hệ thống NutriWise, giúp người dùng tương tác tự nhiên với ứng dụng thông qua ngôn ngữ tự nhiên. Module này hỗ trợ hai chế độ hoạt động linh hoạt để đáp ứng các nhu cầu khác nhau của người dùng.
 
-## Workflow AI-based
+## Mục tiêu kinh doanh
 
-### Quy trình xử lý:
-1. **User gửi tin nhắn** → AI nhận message + context
-2. **AI phân tích** → Trả về JSON structured response
-3. **System xử lý** → Dựa trên AI response để thực hiện hành động
-4. **Response** → Trả về phản hồi tự nhiên cho user
+### Giá trị cốt lõi
+- **Tăng trải nghiệm người dùng**: Giao diện chat tự nhiên, dễ sử dụng
+- **Giảm thời gian thao tác**: Thực hiện tác vụ nhanh chóng qua lệnh thoại
+- **Tăng tỷ lệ sử dụng**: Khuyến khích người dùng tương tác thường xuyên
+- **Hỗ trợ cá nhân hóa**: Tư vấn dinh dưỡng và sức khỏe theo nhu cầu cá nhân
 
-### JSON Response Structure từ AI:
-```json
-{
-  "intent": "add_meal",
-  "confidence": 0.95,
-  "userIntent": "Người dùng muốn ghi nhận bữa ăn",
-  "requiredInfo": {
-    "action": "ADD_MEAL",
-    "requiredParams": ["mealType", "foods"],
-    "providedParams": {"mealType": "lunch", "foods": ["cơm", "thịt kho"]},
-    "missingParams": ["amount", "time"],
-    "smartQuestions": ["Bạn ăn bao nhiêu?", "Ăn lúc mấy giờ?"]
-  },
-  "contextualResponse": "Tôi đã ghi nhận bữa trưa với cơm và thịt kho. Bạn ăn bao nhiêu và lúc mấy giờ vậy?",
-  "nextActions": ["collect_info", "confirm_action"]
-}
+### Đối tượng sử dụng
+- **Người dùng cá nhân**: Theo dõi dinh dưỡng, tập luyện, sức khỏe
+- **Người mới bắt đầu**: Cần hướng dẫn và tư vấn
+- **Người bận rộn**: Muốn thao tác nhanh qua chat
+- **Người quan tâm sức khỏe**: Tìm kiếm lời khuyên chuyên môn
+
+## Chức năng chính
+
+### 1. Chế độ Direct Chat (Mặc định)
+**Mục đích**: Hỗ trợ tương tác tự nhiên và tư vấn dinh dưỡng
+
+**Tính năng**:
+- Chat trực tiếp với AI về các chủ đề dinh dưỡng, sức khỏe
+- Nhận tư vấn cá nhân hóa dựa trên thông tin profile
+- Hỏi đáp về thực phẩm, chế độ ăn, tập luyện
+- Nhận lời khuyên sức khỏe theo tình trạng cá nhân
+
+**Lợi ích**:
+- Phản hồi nhanh chóng và tự nhiên
+- Tiết kiệm tài nguyên hệ thống
+- Phù hợp cho người dùng mới làm quen
+
+### 2. Chế độ AI Agent
+**Mục đích**: Thực hiện tác vụ tự động thông qua lệnh thoại
+
+**Tính năng**:
+- Ghi nhận bữa ăn, bài tập, lượng nước uống
+- Tạo và quản lý mục tiêu dinh dưỡng
+- Xem báo cáo và thống kê
+- Tìm kiếm thực phẩm và gợi ý bữa ăn
+
+**Lợi ích**:
+- Tự động hóa cao, giảm thao tác thủ công
+- Thu thập dữ liệu chính xác và đầy đủ
+- Tăng hiệu quả sử dụng ứng dụng
+
+## Danh mục chức năng chi tiết
+
+### Quản lý thông tin cá nhân
+**Chức năng**: Cập nhật thông tin cá nhân và thể chất
+**Công dụng**: 
+- Duy trì thông tin profile chính xác
+- Cung cấp cơ sở cho tư vấn cá nhân hóa
+- Theo dõi tiến độ thay đổi cơ thể
+
+**Thông tin quản lý**:
+- Thông tin cơ bản: tên, tuổi, giới tính, email, số điện thoại
+- Chỉ số thể chất: chiều cao, cân nặng, cân nặng mục tiêu
+- Thông tin sức khỏe: tình trạng bệnh, dị ứng, hạn chế ăn uống
+- Mức độ hoạt động và lối sống
+
+### Quản lý dinh dưỡng
+**Chức năng**: Ghi nhận và quản lý thông tin bữa ăn
+**Công dụng**:
+- Theo dõi lượng calo và dinh dưỡng hàng ngày
+- Phân tích xu hướng ăn uống
+- Đánh giá mức độ đạt mục tiêu dinh dưỡng
+
+**Thông tin ghi nhận**:
+- Loại bữa ăn (sáng, trưa, tối, ăn nhẹ)
+- Danh sách thực phẩm và lượng ăn
+- Thông tin dinh dưỡng chi tiết (protein, carbs, fat, vitamin)
+- Thời gian, địa điểm và tâm trạng khi ăn
+
+### Quản lý mục tiêu
+**Chức năng**: Thiết lập và theo dõi mục tiêu dinh dưỡng, sức khỏe
+**Công dụng**:
+- Định hướng hành trình cải thiện sức khỏe
+- Đo lường tiến độ và thành công
+- Tạo động lực duy trì lối sống lành mạnh
+
+**Loại mục tiêu**:
+- Mục tiêu cân nặng: giảm cân, tăng cân, duy trì
+- Mục tiêu dinh dưỡng: calo, protein, nước
+- Mục tiêu tập luyện: tần suất, cường độ
+- Mục tiêu sức khỏe: cải thiện chỉ số sức khỏe
+
+### Theo dõi nước uống
+**Chức năng**: Ghi nhận lượng nước uống hàng ngày
+**Công dụng**:
+- Đảm bảo đủ nước cho cơ thể
+- Phòng ngừa mất nước
+- Hỗ trợ quá trình trao đổi chất
+
+**Thông tin theo dõi**:
+- Lượng nước uống (ml)
+- Loại nước (tinh khiết, khoáng, lọc)
+- Thời gian và địa điểm uống
+- Nhiệt độ và loại bình chứa
+
+### Quản lý tập luyện
+**Chức năng**: Ghi nhận hoạt động thể dục, thể thao
+**Công dụng**:
+- Theo dõi lượng calo tiêu thụ
+- Đánh giá hiệu quả tập luyện
+- Cân bằng dinh dưỡng và vận động
+
+**Thông tin ghi nhận**:
+- Loại bài tập và thời gian thực hiện
+- Cường độ và calo tiêu thụ
+- Thiết bị sử dụng và địa điểm tập
+- Tâm trạng và ghi chú cá nhân
+
+### Tìm kiếm và gợi ý
+**Chức năng**: Tìm kiếm thực phẩm và gợi ý bữa ăn
+**Công dụng**:
+- Hỗ trợ lựa chọn thực phẩm phù hợp
+- Đa dạng hóa bữa ăn
+- Tiết kiệm thời gian lập kế hoạch
+
+**Tính năng tìm kiếm**:
+- Tìm kiếm theo tên, danh mục thực phẩm
+- Lọc theo giá trị dinh dưỡng
+- Loại trừ thực phẩm dị ứng
+- Sắp xếp theo độ phổ biến
+
+**Gợi ý bữa ăn**:
+- Dựa trên sở thích và hạn chế ăn uống
+- Phù hợp với mục tiêu calo và dinh dưỡng
+- Cân nhắc thời gian nấu và độ khó
+- Gợi ý theo mùa và ngân sách
+
+### Tư vấn và lời khuyên
+**Chức năng**: Cung cấp tư vấn dinh dưỡng và lời khuyên sức khỏe
+**Công dụng**:
+- Nâng cao kiến thức dinh dưỡng
+- Hỗ trợ quyết định lối sống lành mạnh
+- Phòng ngừa các vấn đề sức khỏe
+
+**Nội dung tư vấn**:
+- Tư vấn dinh dưỡng theo độ tuổi, giới tính
+- Lời khuyên phù hợp với tình trạng sức khỏe
+- Hướng dẫn chế độ ăn cho mục tiêu cụ thể
+- Lời khuyên theo mùa và thời tiết
+
+### Báo cáo và thống kê
+**Chức năng**: Hiển thị thông tin tổng quan và báo cáo
+**Công dụng**:
+- Đánh giá tổng quan tình trạng sức khỏe
+- Theo dõi tiến độ đạt mục tiêu
+- Phân tích xu hướng thay đổi
+
+**Loại báo cáo**:
+- Dashboard tổng quan hàng ngày
+- Báo cáo tuần với phân tích chi tiết
+- Thống kê dinh dưỡng và tập luyện
+- So sánh với mục tiêu đã đặt
+
+## Cấu hình hệ thống
+
+### Biến môi trường cần thiết
+```env
+# Chế độ hoạt động AI Assistant
+AI_AGENT_MODE_ENABLED=false  # true = AI Agent Mode, false = Direct Chat Mode
+
+# Cấu hình OpenAI
+OPENAI_API_KEY=your-openai-api-key
+OPENAI_MODEL=gpt-4o
+OPENAI_MAX_TOKENS=1000
+OPENAI_TEMPERATURE=0.7
+
+# Cấu hình cache
+AI_CACHE_ENABLED=true
+AI_CACHE_EXPIRY_HOURS=24
 ```
 
-## Danh sách các action AI có thể thực hiện
-
-### Cấu trúc định nghĩa action:
-```typescript
-interface ActionDefinition {
-  action: string;                    // Tên action
-  description: string;               // Mô tả chức năng
-  requiredParams: ParamDefinition[]; // Thông tin cần thu thập
-  optionalParams: ParamDefinition[]; // Thông tin tùy chọn
-  confirmationRequired: boolean;     // Cần xác nhận trước khi thực hiện
-}
-
-interface ParamDefinition {
-  name: string;                      // Tên tham số
-  type: 'string' | 'number' | 'enum' | 'date';
-  description: string;               // Mô tả tham số
-  required: boolean;                 // Bắt buộc hay không
-  validation?: ValidationRule[];     // Quy tắc kiểm tra
-}
-```
-
-### Danh sách các action:
-
-#### 1. UPDATE_PROFILE
-**Mô tả:** Cập nhật thông tin cá nhân và thể chất
-
-**Thông tin cần thu thập:**
-- `name` (string, optional): Tên người dùng
-- `age` (number, optional): Tuổi (1-120)
-- `gender` (enum: "male"|"female", optional): Giới tính
-- `height` (number, optional): Chiều cao (cm, 50-300)
-- `weight` (number, optional): Cân nặng (kg, 20-500)
-- `activityLevel` (enum: "sedentary"|"light"|"moderate"|"active"|"very_active", optional): Mức độ hoạt động
-- `email` (string, optional): Email
-- `phone` (string, optional): Số điện thoại
-- `birthDate` (date, optional): Ngày sinh
-- `targetWeight` (number, optional): Cân nặng mục tiêu
-- `medicalConditions` (string[], optional): Tình trạng sức khỏe
-- `allergies` (string[], optional): Dị ứng thực phẩm
-- `dietaryRestrictions` (string[], optional): Hạn chế ăn uống
-
-**Cần xác nhận:** Có
-
-#### 2. ADD_MEAL
-**Mô tả:** Ghi nhận thông tin về bữa ăn đã ăn
-
-**Thông tin cần thu thập:**
-- `mealType` (enum: "breakfast"|"lunch"|"dinner"|"snack", required): Loại bữa ăn
-- `foods` (string[], required): Danh sách thực phẩm
-- `amount` (string, optional): Lượng ăn
-- `time` (date, optional): Thời gian ăn
-- `calories` (number, optional): Tổng calo
-- `protein` (number, optional): Protein (g)
-- `carbs` (number, optional): Carbohydrate (g)
-- `fat` (number, optional): Chất béo (g)
-- `fiber` (number, optional): Chất xơ (g)
-- `sugar` (number, optional): Đường (g)
-- `sodium` (number, optional): Natri (mg)
-- `location` (string, optional): Địa điểm ăn
-- `mood` (enum: "great"|"good"|"okay"|"bad", optional): Tâm trạng khi ăn
-- `notes` (string, optional): Ghi chú
-
-**Cần xác nhận:** Không
-
-#### 3. UPDATE_MEAL
-**Mô tả:** Cập nhật thông tin bữa ăn
-
-**Thông tin cần thu thập:**
-- `mealId` (number, required): ID bữa ăn
-- `mealType` (enum: "breakfast"|"lunch"|"dinner"|"snack", optional): Loại bữa ăn
-- `foods` (string[], optional): Danh sách thực phẩm
-- `amount` (string, optional): Lượng ăn
-- `time` (date, optional): Thời gian ăn
-
-**Cần xác nhận:** Có
-
-#### 4. DELETE_MEAL
-**Mô tả:** Xóa bữa ăn
-
-**Thông tin cần thu thập:**
-- `mealId` (number, required): ID bữa ăn
-
-**Cần xác nhận:** Có
-
-#### 5. VIEW_MEALS
-**Mô tả:** Xem danh sách bữa ăn
-
-**Thông tin cần thu thập:**
-- `date` (date, optional): Ngày cụ thể
-- `mealType` (enum: "breakfast"|"lunch"|"dinner"|"snack", optional): Loại bữa ăn
-- `limit` (number, optional): Số lượng (mặc định: 10)
-
-**Cần xác nhận:** Không
-
-#### 6. CREATE_GOAL
-**Mô tả:** Tạo mục tiêu về cân nặng, dinh dưỡng hoặc tập luyện
-
-**Thông tin cần thu thập:**
-- `goalType` (enum: "weight_loss"|"weight_gain"|"maintain"|"muscle_gain"|"calorie_target"|"protein_target"|"water_target"|"exercise_frequency", required): Loại mục tiêu
-- `targetValue` (number, required): Giá trị mục tiêu
-- `timeframe` (string, optional): Thời gian thực hiện
-- `description` (string, optional): Mô tả chi tiết
-- `startDate` (date, optional): Ngày bắt đầu
-- `endDate` (date, optional): Ngày kết thúc
-- `priority` (enum: "low"|"medium"|"high", optional): Mức độ ưu tiên
-- `reminderFrequency` (enum: "daily"|"weekly"|"monthly", optional): Tần suất nhắc nhở
-- `milestones` (object[], optional): Các cột mốc quan trọng
-
-**Cần xác nhận:** Có
-
-#### 7. UPDATE_GOAL
-**Mô tả:** Cập nhật mục tiêu
-
-**Thông tin cần thu thập:**
-- `goalId` (number, required): ID mục tiêu
-- `targetValue` (number, optional): Giá trị mục tiêu
-- `timeframe` (string, optional): Thời gian thực hiện
-- `description` (string, optional): Mô tả chi tiết
-
-**Cần xác nhận:** Có
-
-#### 8. DELETE_GOAL
-**Mô tả:** Xóa mục tiêu
-
-**Thông tin cần thu thập:**
-- `goalId` (number, required): ID mục tiêu
-
-**Cần xác nhận:** Có
-
-#### 9. VIEW_GOALS
-**Mô tả:** Xem danh sách mục tiêu
-
-**Thông tin cần thu thập:**
-- `status` (enum: "active"|"completed"|"paused", optional): Trạng thái mục tiêu
-- `goalType` (enum: "weight_loss"|"weight_gain"|"maintain"|"muscle_gain", optional): Loại mục tiêu
-
-**Cần xác nhận:** Không
-
-#### 10. ADD_WATER
-**Mô tả:** Ghi nhận lượng nước đã uống trong ngày
-
-**Thông tin cần thu thập:**
-- `amount` (number, required): Lượng nước (ml)
-- `time` (date, optional): Thời gian uống
-- `waterType` (enum: "plain"|"mineral"|"filtered"|"bottled", optional): Loại nước
-- `temperature` (enum: "cold"|"room"|"warm", optional): Nhiệt độ nước
-- `container` (string, optional): Loại bình/chai
-- `location` (string, optional): Địa điểm uống
-- `notes` (string, optional): Ghi chú
-
-**Cần xác nhận:** Không
-
-#### 11. UPDATE_WATER
-**Mô tả:** Cập nhật lượng nước
-
-**Thông tin cần thu thập:**
-- `waterId` (number, required): ID ghi nhận nước
-- `amount` (number, optional): Lượng nước (ml)
-- `time` (date, optional): Thời gian uống
-
-**Cần xác nhận:** Có
-
-#### 12. DELETE_WATER
-**Mô tả:** Xóa ghi nhận nước
-
-**Thông tin cần thu thập:**
-- `waterId` (number, required): ID ghi nhận nước
-
-**Cần xác nhận:** Có
-
-#### 13. VIEW_WATER_HISTORY
-**Mô tả:** Xem lịch sử uống nước
-
-**Thông tin cần thu thập:**
-- `date` (date, optional): Ngày cụ thể
-- `limit` (number, optional): Số lượng (mặc định: 10)
-
-**Cần xác nhận:** Không
-
-#### 14. ADD_EXERCISE
-**Mô tả:** Ghi nhận hoạt động thể dục, thể thao đã thực hiện
-
-**Thông tin cần thu thập:**
-- `exerciseType` (string, required): Loại bài tập
-- `duration` (number, required): Thời gian (phút)
-- `intensity` (enum: "low"|"medium"|"high", optional): Cường độ
-- `calories` (number, optional): Calo tiêu thụ
-- `distance` (number, optional): Khoảng cách (km)
-- `steps` (number, optional): Số bước chân
-- `heartRate` (number, optional): Nhịp tim (bpm)
-- `location` (string, optional): Địa điểm tập
-- `equipment` (string[], optional): Thiết bị sử dụng
-- `workoutPlan` (string, optional): Kế hoạch tập luyện
-- `mood` (enum: "great"|"good"|"okay"|"bad", optional): Tâm trạng khi tập
-- `notes` (string, optional): Ghi chú
-- `startTime` (date, optional): Thời gian bắt đầu
-- `endTime` (date, optional): Thời gian kết thúc
-
-**Cần xác nhận:** Không
-
-#### 15. UPDATE_EXERCISE
-**Mô tả:** Cập nhật bài tập
-
-**Thông tin cần thu thập:**
-- `exerciseId` (number, required): ID bài tập
-- `exerciseType` (string, optional): Loại bài tập
-- `duration` (number, optional): Thời gian (phút)
-- `intensity` (enum: "low"|"medium"|"high", optional): Cường độ
-- `calories` (number, optional): Calo tiêu thụ
-
-**Cần xác nhận:** Có
-
-#### 16. DELETE_EXERCISE
-**Mô tả:** Xóa bài tập
-
-**Thông tin cần thu thập:**
-- `exerciseId` (number, required): ID bài tập
-
-**Cần xác nhận:** Có
-
-#### 17. VIEW_EXERCISES
-**Mô tả:** Xem danh sách bài tập
-
-**Thông tin cần thu thập:**
-- `date` (date, optional): Ngày cụ thể
-- `exerciseType` (string, optional): Loại bài tập
-- `limit` (number, optional): Số lượng (mặc định: 10)
-
-**Cần xác nhận:** Không
-
-#### 18. VIEW_DASHBOARD
-**Mô tả:** Hiển thị thông tin tổng quan về tình trạng dinh dưỡng và sức khỏe
-
-**Thông tin cần thu thập:** Không cần
-
-**Cần xác nhận:** Không
-
-#### 19. VIEW_WEEKLY_REPORT
-**Mô tả:** Xem báo cáo tuần
-
-**Thông tin cần thu thập:**
-- `weekStart` (date, optional): Ngày bắt đầu tuần
-
-**Cần xác nhận:** Không
-
-#### 20. SEARCH_FOOD
-**Mô tả:** Tìm kiếm thực phẩm
-
-**Thông tin cần thu thập:**
-- `query` (string, required): Từ khóa tìm kiếm
-- `limit` (number, optional): Số lượng kết quả (mặc định: 10)
-- `category` (enum: "fruits"|"vegetables"|"meat"|"dairy"|"grains"|"nuts"|"beverages", optional): Danh mục thực phẩm
-- `calorieRange` (object, optional): Khoảng calo {min, max}
-- `proteinRange` (object, optional): Khoảng protein {min, max}
-- `allergenFree` (string[], optional): Loại trừ dị ứng
-- `dietaryRestrictions` (string[], optional): Hạn chế ăn uống
-- `sortBy` (enum: "name"|"calories"|"protein"|"popularity", optional): Sắp xếp theo
-
-**Cần xác nhận:** Không
-
-#### 21. GET_MEAL_SUGGESTIONS
-**Mô tả:** Lấy gợi ý bữa ăn thông minh
-
-**Thông tin cần thu thập:**
-- `mealType` (enum: "breakfast"|"lunch"|"dinner"|"snack", optional): Loại bữa ăn
-- `preferences` (string[], optional): Sở thích thực phẩm
-- `restrictions` (string[], optional): Hạn chế ăn uống
-- `calorieTarget` (number, optional): Mục tiêu calo
-- `proteinTarget` (number, optional): Mục tiêu protein
-- `cookingTime` (enum: "quick"|"medium"|"long", optional): Thời gian nấu
-- `difficulty` (enum: "easy"|"medium"|"hard", optional): Độ khó
-- `cuisine` (string[], optional): Loại ẩm thực
-- `ingredients` (string[], optional): Nguyên liệu có sẵn
-- `budget` (enum: "low"|"medium"|"high", optional): Ngân sách
-- `servings` (number, optional): Số người ăn
-- `seasonal` (boolean, optional): Thực phẩm theo mùa
-
-**Cần xác nhận:** Không
-
-#### 22. GET_NUTRITION_ADVICE
-**Mô tả:** Tư vấn dinh dưỡng
-
-**Thông tin cần thu thập:**
-- `topic` (string, optional): Chủ đề tư vấn
-- `goal` (string, optional): Mục tiêu dinh dưỡng
-- `age` (number, optional): Tuổi
-- `gender` (enum: "male"|"female", optional): Giới tính
-- `activityLevel` (enum: "sedentary"|"light"|"moderate"|"active"|"very_active", optional): Mức độ hoạt động
-- `healthConditions` (string[], optional): Tình trạng sức khỏe
-- `allergies` (string[], optional): Dị ứng
-- `dietaryRestrictions` (string[], optional): Hạn chế ăn uống
-- `currentWeight` (number, optional): Cân nặng hiện tại
-- `targetWeight` (number, optional): Cân nặng mục tiêu
-- `lifestyle` (enum: "busy"|"moderate"|"relaxed", optional): Lối sống
-- `cookingSkill` (enum: "beginner"|"intermediate"|"advanced", optional): Kỹ năng nấu ăn
-
-**Cần xác nhận:** Không
-
-#### 23. GET_HEALTH_TIPS
-**Mô tả:** Lời khuyên sức khỏe
-
-**Thông tin cần thu thập:**
-- `category` (string, optional): Danh mục lời khuyên
-- `age` (number, optional): Tuổi
-- `gender` (enum: "male"|"female", optional): Giới tính
-- `healthGoals` (string[], optional): Mục tiêu sức khỏe
-- `currentHealthStatus` (string[], optional): Tình trạng sức khỏe hiện tại
-- `lifestyle` (enum: "sedentary"|"active"|"very_active", optional): Lối sống
-- `stressLevel` (enum: "low"|"medium"|"high", optional): Mức độ căng thẳng
-- `sleepQuality` (enum: "poor"|"fair"|"good"|"excellent", optional): Chất lượng giấc ngủ
-- `dietType` (enum: "omnivore"|"vegetarian"|"vegan"|"keto"|"paleo", optional): Chế độ ăn
-- `season` (enum: "spring"|"summer"|"autumn"|"winter", optional): Mùa trong năm
-- `weather` (enum: "hot"|"warm"|"cool"|"cold", optional): Thời tiết
-
-**Cần xác nhận:** Không
-
-#### 24. HELP
-**Mô tả:** Hiển thị hướng dẫn sử dụng và các chức năng có sẵn
-
-**Thông tin cần thu thập:** Không cần
-
-**Cần xác nhận:** Không
-
-### Quy trình AI check action:
-
-1. **Nhận tin nhắn** từ user
-2. **AI phân tích** xem tin nhắn có liên quan đến action nào trong danh sách không
-3. **Nếu có action:**
-   - Xác định action cụ thể
-   - Trích xuất thông tin có sẵn từ tin nhắn
-   - Xác định thông tin còn thiếu
-   - Trả về JSON response với action và requiredInfo
-4. **Nếu không có action:**
-   - Xử lý như chat bình thường
-   - Trả về phản hồi tự nhiên, không có action
-
-## Quy trình AI check action:
-
-1. **Nhận tin nhắn** từ user
-2. **AI phân tích** xem tin nhắn có liên quan đến action nào trong danh sách không
-3. **Nếu có action:**
-   - Xác định action cụ thể
-   - Trích xuất thông tin có sẵn từ tin nhắn
-   - Xác định thông tin còn thiếu
-   - Trả về JSON response với action và requiredInfo
-4. **Nếu không có action:**
-   - Xử lý như chat bình thường
-   - Trả về phản hồi tự nhiên, không có action
-
-## Cấu hình
-
-### Environment Variables
-Sử dụng các biến môi trường có sẵn trong `.env`:
-- `OPENAI_API_KEY`, `OPENAI_MODEL`, `OPENAI_MAX_TOKENS`, `OPENAI_TEMPERATURE`
-- `AI_CACHE_ENABLED`, `AI_CACHE_EXPIRY_HOURS`
-
-### Developer Documentation
-Chi tiết kỹ thuật được cung cấp trong Swagger documentation tại `/api-docs`
+### Chuyển đổi chế độ hoạt động
+1. **Kích hoạt AI Agent Mode**: Đặt `AI_AGENT_MODE_ENABLED=true`
+2. **Kích hoạt Direct Chat Mode**: Đặt `AI_AGENT_MODE_ENABLED=false`
+3. **Khởi động lại server** sau khi thay đổi cấu hình
+
+## API Endpoints
+
+### POST /ai-assistant/chat
+**Mục đích**: Gửi tin nhắn đến AI Assistant
+**Headers**: Authorization (JWT token), Content-Type: application/json
+**Body**: JSON chứa nội dung tin nhắn
+**Response**: Phản hồi từ AI với thông tin intent và context
+
+### GET /ai-assistant/history
+**Mục đích**: Lấy lịch sử chat của người dùng
+**Headers**: Authorization (JWT token)
+**Query Parameters**: limit (số lượng tin nhắn, mặc định: 50)
+**Response**: Danh sách tin nhắn đã trao đổi
+
+## Lưu ý triển khai
+
+### Yêu cầu hệ thống
+- AI Agent Mode cần cấu hình đầy đủ các action trong file cấu hình
+- Direct Chat Mode phù hợp cho môi trường có tài nguyên hạn chế
+- Lịch sử chat được lưu trữ trong database cho cả hai chế độ
+
+### Khuyến nghị sử dụng
+- Sử dụng Direct Chat Mode cho người dùng mới và tư vấn chung
+- Chuyển sang AI Agent Mode khi người dùng đã quen thuộc
+- Kết hợp cả hai chế độ để tối ưu trải nghiệm người dùng
+
+### Tài liệu kỹ thuật
+Chi tiết kỹ thuật và API documentation được cung cấp trong Swagger tại `/api-docs`

@@ -11,18 +11,11 @@ export class CreateWaterIntakeDto {
   amount: number;
 
   @ApiProperty({
-    description: 'Date of water intake (ISO format)',
-    example: new Date().toISOString()
+    description: 'Datetime of water intake (ISO 8601)',
+    example: new Date().toISOString(),
   })
   @IsDateString()
-  date: string;
-
-  @ApiProperty({
-    description: 'Time of water intake (HH:MM)',
-    example: '10:30'
-  })
-  @IsString()
-  time: string;
+  datetime: string;
 
   @ApiProperty({
     description: 'Notes about water intake',
@@ -33,10 +26,5 @@ export class CreateWaterIntakeDto {
   @IsOptional()
   notes?: string;
 
-  @ApiProperty({
-    description: 'User ID',
-    example: 1
-  })
-  @IsNumber()
-  userId: number;
+
 } 

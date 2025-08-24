@@ -4,10 +4,9 @@ import { ExerciseService } from './exercise.service';
 import { ExerciseController } from './exercise.controller';
 import { Exercise } from './entities/exercise.entity';
 import { Profile } from '../profile/entities/profile.entity';
-import { AiModule } from '../ai/ai.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Exercise, Profile]), AiModule],
+  imports: [TypeOrmModule.forFeature([Exercise, Profile])],
   controllers: [ExerciseController],
   providers: [ExerciseService],
   exports: [ExerciseService],

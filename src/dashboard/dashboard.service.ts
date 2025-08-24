@@ -24,7 +24,7 @@ export class DashboardService {
     const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
     const endOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59);
 
-    // Lấy dữ liệu bữa ăn hôm nay
+    // Get today's meal data
     const todayMeals = await this.mealRepository.find({
       where: {
         userId,
@@ -33,16 +33,16 @@ export class DashboardService {
       },
     });
 
-    // Lấy dữ liệu nước uống hôm nay
+    // Get today's water intake data
     const todayWaterIntake = await this.waterIntakeRepository.find({
       where: {
         userId,
-        date: today,
+        datetime: Between(startOfDay, endOfDay),
         isDeleted: false,
       },
     });
 
-    // Lấy dữ liệu tập luyện hôm nay
+    // Get today's exercise data
     const todayExercises = await this.exerciseRepository.find({
       where: {
         userId,
@@ -51,7 +51,7 @@ export class DashboardService {
       },
     });
 
-    // Lấy mục tiêu hiện tại
+    // Get current goal
     const currentGoal = await this.goalRepository.findOne({
       where: {
         userId,
@@ -60,19 +60,19 @@ export class DashboardService {
       order: { createdAt: 'DESC' },
     });
 
-    // Tính toán tổng calo tiêu thụ hôm nay
+    // Calculate total calories consumed today
     const totalCaloriesConsumed = todayMeals.reduce((sum, meal) => sum + meal.totalCalories, 0);
     const totalProteinConsumed = todayMeals.reduce((sum, meal) => sum + meal.totalProtein, 0);
     const totalCarbsConsumed = todayMeals.reduce((sum, meal) => sum + meal.totalCarbs, 0);
     const totalFatConsumed = todayMeals.reduce((sum, meal) => sum + meal.totalFat, 0);
 
-    // Tính toán tổng calo đốt cháy hôm nay
+    // Calculate total calories burned today
     const totalCaloriesBurned = todayExercises.reduce((sum, exercise) => sum + exercise.caloriesBurned, 0);
 
-    // Tính toán tổng nước uống hôm nay
+    // Calculate total water intake today
     const totalWaterIntake = todayWaterIntake.reduce((sum, water) => sum + water.amount, 0);
 
-    // Tính toán net calo
+    // Calculate net calories
     const netCalories = totalCaloriesConsumed - totalCaloriesBurned;
 
     return {
@@ -120,7 +120,7 @@ export class DashboardService {
     const today = new Date();
     const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
 
-    // Lấy dữ liệu 7 ngày qua
+    // Get data for the last 7 days
     const weeklyMeals = await this.mealRepository.find({
       where: {
         userId,
@@ -140,12 +140,12 @@ export class DashboardService {
     const weeklyWaterIntake = await this.waterIntakeRepository.find({
       where: {
         userId,
-        date: Between(weekAgo, today),
+        datetime: Between(weekAgo, today),
         isDeleted: false,
       },
     });
 
-    // Tính toán trung bình hàng ngày
+    // Calculate average daily values
     const avgDailyCalories = weeklyMeals.reduce((sum, meal) => sum + meal.totalCalories, 0) / 7;
     const avgDailyCaloriesBurned = weeklyExercises.reduce((sum, ex) => sum + ex.caloriesBurned, 0) / 7;
     const avgDailyWaterIntake = weeklyWaterIntake.reduce((sum, water) => sum + water.amount, 0) / 7;

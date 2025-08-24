@@ -20,49 +20,66 @@ import { RolesGuard } from '../auth/guards/roles.guard';
 @UseGuards(JwtAuthGuard, RolesGuard)
 @ApiBearerAuth()
 export class WaterController {
-  constructor(private readonly waterService: WaterService) {}
+  constructor(
+    private readonly waterService: WaterService,
+  ) {}
 
   @Post()
-  @ApiOperation({ summary: 'Log water intake' })
-  @ApiResponse({ status: 201, description: 'Water intake logged successfully' })
-  @ApiResponse({ status: 400, description: 'Bad request' })
-  @ApiResponse({ status: 401, description: 'Unauthorized' })
-  create(@Body() createWaterIntakeDto: CreateWaterIntakeDto, @Request() req) {
-    createWaterIntakeDto.userId = req.user.userId;
-    return this.waterService.create(createWaterIntakeDto);
+  @ApiOperation({ summary: 'Ghi nhận uống nước' })
+  @ApiResponse({ status: 201, description: 'Ghi nhận thành công' })
+  @ApiResponse({ status: 400, description: 'Dữ liệu không hợp lệ' })
+  @ApiResponse({ status: 401, description: 'Chưa đăng nhập' })
+  async create(@Body() createWaterIntakeDto: CreateWaterIntakeDto, @Request() req) {
+    return await this.waterService.create(createWaterIntakeDto, req.user.userId);
   }
 
   @Get()
-  @ApiOperation({ summary: 'Get all water intake records for current user' })
-  @ApiResponse({ status: 200, description: 'List of water intake records' })
-  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiOperation({ summary: 'Lấy tất cả bản ghi uống nước' })
+  @ApiResponse({ status: 200, description: 'Danh sách bản ghi' })
+  @ApiResponse({ status: 401, description: 'Chưa đăng nhập' })
   findAll(@Request() req) {
-    return this.waterService.findAll();
+    return this.waterService.findAllByUserId(req.user.userId);
+  }
+
+  @Get('today')
+  @ApiOperation({ summary: 'Lấy tiến độ uống nước hôm nay' })
+  @ApiResponse({ status: 200, description: 'Tiến độ hôm nay' })
+  @ApiResponse({ status: 401, description: 'Chưa đăng nhập' })
+  getTodayProgress(@Request() req) {
+    return this.waterService.getTodayProgress(req.user.userId);
+  }
+
+  @Get('stats/:date')
+  @ApiOperation({ summary: 'Thống kê uống nước theo ngày' })
+  @ApiResponse({ status: 200, description: 'Thống kê chi tiết' })
+  @ApiResponse({ status: 401, description: 'Chưa đăng nhập' })
+  getStatsByDate(@Param('date') date: string, @Request() req) {
+    return this.waterService.getStatsByDate(req.user.userId, date);
   }
 
   @Get(':id')
-  @ApiOperation({ summary: 'Get water intake by ID' })
-  @ApiResponse({ status: 200, description: 'Water intake found' })
-  @ApiResponse({ status: 404, description: 'Water intake not found' })
-  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiOperation({ summary: 'Lấy bản ghi theo ID' })
+  @ApiResponse({ status: 200, description: 'Bản ghi tìm thấy' })
+  @ApiResponse({ status: 404, description: 'Không tìm thấy' })
+  @ApiResponse({ status: 401, description: 'Chưa đăng nhập' })
   findOne(@Param('id') id: string) {
     return this.waterService.findOne(+id);
   }
 
   @Patch(':id')
-  @ApiOperation({ summary: 'Update water intake' })
-  @ApiResponse({ status: 200, description: 'Water intake updated successfully' })
-  @ApiResponse({ status: 404, description: 'Water intake not found' })
-  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiOperation({ summary: 'Cập nhật bản ghi' })
+  @ApiResponse({ status: 200, description: 'Cập nhật thành công' })
+  @ApiResponse({ status: 404, description: 'Không tìm thấy' })
+  @ApiResponse({ status: 401, description: 'Chưa đăng nhập' })
   update(@Param('id') id: string, @Body() updateWaterIntakeDto: any) {
     return this.waterService.update(+id, updateWaterIntakeDto);
   }
 
   @Delete(':id')
-  @ApiOperation({ summary: 'Delete water intake' })
-  @ApiResponse({ status: 200, description: 'Water intake deleted successfully' })
-  @ApiResponse({ status: 404, description: 'Water intake not found' })
-  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiOperation({ summary: 'Xóa bản ghi' })
+  @ApiResponse({ status: 200, description: 'Xóa thành công' })
+  @ApiResponse({ status: 404, description: 'Không tìm thấy' })
+  @ApiResponse({ status: 401, description: 'Chưa đăng nhập' })
   remove(@Param('id') id: string) {
     return this.waterService.remove(+id);
   }
