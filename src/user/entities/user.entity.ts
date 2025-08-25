@@ -127,14 +127,14 @@ export class User {
     description: 'Thời gian tạo tài khoản',
     example: '2024-01-01T00:00:00.000Z'
   })
-  @CreateDateColumn()
+  @CreateDateColumn({ type: 'timestamp with time zone' })
   createdAt: Date;
 
   @ApiProperty({ 
     description: 'Thời gian cập nhật cuối',
     example: '2024-01-01T12:00:00.000Z'
   })
-  @UpdateDateColumn()
+  @UpdateDateColumn({ type: 'timestamp with time zone' })
   updatedAt: Date;
 
   // Relations - sử dụng string để tránh circular dependency

@@ -1,6 +1,6 @@
-import { IsEnum, IsBoolean, IsOptional, IsString, IsArray, ValidateNested, Matches, IsDateString } from 'class-validator';
+import { IsEnum, IsBoolean, IsOptional, IsString, IsArray, ValidateNested, IsDateString } from 'class-validator';
 import { Type } from 'class-transformer';
-import { AIPersonality, AIStyle, AITone, NotificationType, Theme, Language } from '../../common/enums/settings.enum';
+import { NotificationType } from '../../common/enums/settings.enum';
 
 export class AICustomPreferencesDto {
   @IsOptional()

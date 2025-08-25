@@ -1,6 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 import { User } from '../../user/entities/user.entity';
-import { AIPersonality, AIStyle, AITone, NotificationType, Theme, Language } from '../../common/enums/settings.enum';
+import { NotificationType } from '../../common/enums/settings.enum';
 
 @Entity('user_settings')
 export class UserSettings {

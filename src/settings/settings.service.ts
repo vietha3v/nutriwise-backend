@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UserSettings } from './entities/user-settings.entity';
-import { AIPersonality, AIStyle, AITone, NotificationType, Theme, Language } from '../common/enums/settings.enum';
+import { NotificationType } from '../common/enums/settings.enum';
 import { UpdateSettingsDto, SettingsResponseDto } from './dto/settings.dto';
 
 @Injectable()
