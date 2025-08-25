@@ -16,19 +16,16 @@ export class WaterIntake {
   @Column({ type: 'decimal', precision: 10, scale: 2 })
   amount: number; // in ml
 
-  @Column({ type: 'timestamp' })
+  @Column({ type: 'timestamp with time zone', default: () => 'CURRENT_TIMESTAMP' })
   datetime: Date;
-
-  @Column({ type: 'text', nullable: true })
-  notes: string;
 
   @Column({ default: false })
   isDeleted: boolean;
 
-  @CreateDateColumn()
+  @CreateDateColumn({ type: 'timestamp with time zone' })
   createdAt: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ type: 'timestamp with time zone' })
   updatedAt: Date;
 
   @ManyToOne('User', 'waterIntakes', { onDelete: 'CASCADE' })

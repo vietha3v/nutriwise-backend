@@ -16,15 +16,4 @@ export class CreateWaterIntakeDto {
   })
   @IsDateString()
   datetime: string;
-
-  @ApiProperty({
-    description: 'Notes about water intake',
-    required: false,
-    example: 'After workout'
-  })
-  @IsString()
-  @IsOptional()
-  notes?: string;
-
-
 } 
