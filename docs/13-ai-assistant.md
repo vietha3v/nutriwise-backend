@@ -2,212 +2,316 @@
 
 ## Tổng quan
 
-Module AI Assistant là trợ lý thông minh tích hợp trong hệ thống NutriWise, giúp người dùng tương tác tự nhiên với ứng dụng thông qua ngôn ngữ tự nhiên. Module này hỗ trợ hai chế độ hoạt động linh hoạt để đáp ứng các nhu cầu khác nhau của người dùng.
+Module AI Assistant cung cấp khả năng tương tác thông minh với người dùng thông qua chatbot, trả lời câu hỏi về dinh dưỡng, sức khỏe và đưa ra lời khuyên cá nhân hóa. Module này hoạt động theo nguyên tắc: **nhận câu hỏi → phân tích context → gửi OpenAI → trả lời thông minh**.
 
-## Mục tiêu kinh doanh
+## Kiến trúc
 
-### Giá trị cốt lõi
-- **Tăng trải nghiệm người dùng**: Giao diện chat tự nhiên, dễ sử dụng
-- **Giảm thời gian thao tác**: Thực hiện tác vụ nhanh chóng qua lệnh thoại
-- **Tăng tỷ lệ sử dụng**: Khuyến khích người dùng tương tác thường xuyên
-- **Hỗ trợ cá nhân hóa**: Tư vấn dinh dưỡng và sức khỏe theo nhu cầu cá nhân
-
-### Đối tượng sử dụng
-- **Người dùng cá nhân**: Theo dõi dinh dưỡng, tập luyện, sức khỏe
-- **Người mới bắt đầu**: Cần hướng dẫn và tư vấn
-- **Người bận rộn**: Muốn thao tác nhanh qua chat
-- **Người quan tâm sức khỏe**: Tìm kiếm lời khuyên chuyên môn
-
-## Chức năng chính
-
-### 1. Chế độ Direct Chat (Mặc định)
-**Mục đích**: Hỗ trợ tương tác tự nhiên và tư vấn dinh dưỡng
-
-**Tính năng**:
-- Chat trực tiếp với AI về các chủ đề dinh dưỡng, sức khỏe
-- Nhận tư vấn cá nhân hóa dựa trên thông tin profile
-- Hỏi đáp về thực phẩm, chế độ ăn, tập luyện
-- Nhận lời khuyên sức khỏe theo tình trạng cá nhân
-
-**Lợi ích**:
-- Phản hồi nhanh chóng và tự nhiên
-- Tiết kiệm tài nguyên hệ thống
-- Phù hợp cho người dùng mới làm quen
-
-### 2. Chế độ AI Agent
-**Mục đích**: Thực hiện tác vụ tự động thông qua lệnh thoại
-
-**Tính năng**:
-- Ghi nhận bữa ăn, bài tập, lượng nước uống
-- Tạo và quản lý mục tiêu dinh dưỡng
-- Xem báo cáo và thống kê
-- Tìm kiếm thực phẩm và gợi ý bữa ăn
-
-**Lợi ích**:
-- Tự động hóa cao, giảm thao tác thủ công
-- Thu thập dữ liệu chính xác và đầy đủ
-- Tăng hiệu quả sử dụng ứng dụng
-
-## Danh mục chức năng chi tiết
-
-### Quản lý thông tin cá nhân
-**Chức năng**: Cập nhật thông tin cá nhân và thể chất
-**Công dụng**: 
-- Duy trì thông tin profile chính xác
-- Cung cấp cơ sở cho tư vấn cá nhân hóa
-- Theo dõi tiến độ thay đổi cơ thể
-
-**Thông tin quản lý**:
-- Thông tin cơ bản: tên, tuổi, giới tính, email, số điện thoại
-- Chỉ số thể chất: chiều cao, cân nặng, cân nặng mục tiêu
-- Thông tin sức khỏe: tình trạng bệnh, dị ứng, hạn chế ăn uống
-- Mức độ hoạt động và lối sống
-
-### Quản lý dinh dưỡng
-**Chức năng**: Ghi nhận và quản lý thông tin bữa ăn
-**Công dụng**:
-- Theo dõi lượng calo và dinh dưỡng hàng ngày
-- Phân tích xu hướng ăn uống
-- Đánh giá mức độ đạt mục tiêu dinh dưỡng
-
-**Thông tin ghi nhận**:
-- Loại bữa ăn (sáng, trưa, tối, ăn nhẹ)
-- Danh sách thực phẩm và lượng ăn
-- Thông tin dinh dưỡng chi tiết (protein, carbs, fat, vitamin)
-- Thời gian, địa điểm và tâm trạng khi ăn
-
-### Quản lý mục tiêu
-**Chức năng**: Thiết lập và theo dõi mục tiêu dinh dưỡng, sức khỏe
-**Công dụng**:
-- Định hướng hành trình cải thiện sức khỏe
-- Đo lường tiến độ và thành công
-- Tạo động lực duy trì lối sống lành mạnh
-
-**Loại mục tiêu**:
-- Mục tiêu cân nặng: giảm cân, tăng cân, duy trì
-- Mục tiêu dinh dưỡng: calo, protein, nước
-- Mục tiêu tập luyện: tần suất, cường độ
-- Mục tiêu sức khỏe: cải thiện chỉ số sức khỏe
-
-### Theo dõi nước uống
-**Chức năng**: Ghi nhận lượng nước uống hàng ngày
-**Công dụng**:
-- Đảm bảo đủ nước cho cơ thể
-- Phòng ngừa mất nước
-- Hỗ trợ quá trình trao đổi chất
-
-**Thông tin theo dõi**:
-- Lượng nước uống (ml)
-- Loại nước (tinh khiết, khoáng, lọc)
-- Thời gian và địa điểm uống
-- Nhiệt độ và loại bình chứa
-
-### Quản lý tập luyện
-**Chức năng**: Ghi nhận hoạt động thể dục, thể thao
-**Công dụng**:
-- Theo dõi lượng calo tiêu thụ
-- Đánh giá hiệu quả tập luyện
-- Cân bằng dinh dưỡng và vận động
-
-**Thông tin ghi nhận**:
-- Loại bài tập và thời gian thực hiện
-- Cường độ và calo tiêu thụ
-- Thiết bị sử dụng và địa điểm tập
-- Tâm trạng và ghi chú cá nhân
-
-### Tìm kiếm và gợi ý
-**Chức năng**: Tìm kiếm thực phẩm và gợi ý bữa ăn
-**Công dụng**:
-- Hỗ trợ lựa chọn thực phẩm phù hợp
-- Đa dạng hóa bữa ăn
-- Tiết kiệm thời gian lập kế hoạch
-
-**Tính năng tìm kiếm**:
-- Tìm kiếm theo tên, danh mục thực phẩm
-- Lọc theo giá trị dinh dưỡng
-- Loại trừ thực phẩm dị ứng
-- Sắp xếp theo độ phổ biến
-
-**Gợi ý bữa ăn**:
-- Dựa trên sở thích và hạn chế ăn uống
-- Phù hợp với mục tiêu calo và dinh dưỡng
-- Cân nhắc thời gian nấu và độ khó
-- Gợi ý theo mùa và ngân sách
-
-### Tư vấn và lời khuyên
-**Chức năng**: Cung cấp tư vấn dinh dưỡng và lời khuyên sức khỏe
-**Công dụng**:
-- Nâng cao kiến thức dinh dưỡng
-- Hỗ trợ quyết định lối sống lành mạnh
-- Phòng ngừa các vấn đề sức khỏe
-
-**Nội dung tư vấn**:
-- Tư vấn dinh dưỡng theo độ tuổi, giới tính
-- Lời khuyên phù hợp với tình trạng sức khỏe
-- Hướng dẫn chế độ ăn cho mục tiêu cụ thể
-- Lời khuyên theo mùa và thời tiết
-
-### Báo cáo và thống kê
-**Chức năng**: Hiển thị thông tin tổng quan và báo cáo
-**Công dụng**:
-- Đánh giá tổng quan tình trạng sức khỏe
-- Theo dõi tiến độ đạt mục tiêu
-- Phân tích xu hướng thay đổi
-
-**Loại báo cáo**:
-- Dashboard tổng quan hàng ngày
-- Báo cáo tuần với phân tích chi tiết
-- Thống kê dinh dưỡng và tập luyện
-- So sánh với mục tiêu đã đặt
-
-## Cấu hình hệ thống
-
-### Biến môi trường cần thiết
-```env
-# Chế độ hoạt động AI Assistant
-AI_AGENT_MODE_ENABLED=false  # true = AI Agent Mode, false = Direct Chat Mode
-
-# Cấu hình OpenAI
-OPENAI_API_KEY=your-openai-api-key
-OPENAI_MODEL=gpt-4o
-OPENAI_MAX_TOKENS=1000
-OPENAI_TEMPERATURE=0.7
-
-# Cấu hình cache
-AI_CACHE_ENABLED=true
-AI_CACHE_EXPIRY_HOURS=24
+### Luồng xử lý AI Assistant
+```
+1. Nhận câu hỏi từ người dùng
+2. Phân tích context và lịch sử chat
+3. Chuẩn bị prompt cho OpenAI
+4. Gửi câu hỏi lên OpenAI
+5. Nhận response và trả về câu trả lời
 ```
 
-### Chuyển đổi chế độ hoạt động
-1. **Kích hoạt AI Agent Mode**: Đặt `AI_AGENT_MODE_ENABLED=true`
-2. **Kích hoạt Direct Chat Mode**: Đặt `AI_AGENT_MODE_ENABLED=false`
-3. **Khởi động lại server** sau khi thay đổi cấu hình
+### Các thành phần chính
+- **AiAssistantService**: Xử lý logic chat và tương tác
+- **AiAssistantController**: API endpoints cho chat
+- **ChatMessage Entity**: Lưu trữ lịch sử chat
+- **OpenAI Integration**: Tích hợp trực tiếp với OpenAI API
 
 ## API Endpoints
 
-### POST /ai-assistant/chat
-**Mục đích**: Gửi tin nhắn đến AI Assistant
-**Headers**: Authorization (JWT token), Content-Type: application/json
-**Body**: JSON chứa nội dung tin nhắn
-**Response**: Phản hồi từ AI với thông tin intent và context
+### 1. Chat với AI Assistant
+**Endpoint:** `POST /ai-assistant/chat`
 
-### GET /ai-assistant/history
-**Mục đích**: Lấy lịch sử chat của người dùng
-**Headers**: Authorization (JWT token)
-**Query Parameters**: limit (số lượng tin nhắn, mặc định: 50)
-**Response**: Danh sách tin nhắn đã trao đổi
+**Mô tả:** Gửi tin nhắn và nhận phản hồi từ AI Assistant
 
-## Lưu ý triển khai
+**Request Body:**
+```json
+{
+  "message": "Tôi nên uống bao nhiêu nước mỗi ngày?",
+  "context": "nutrition_advice"
+}
+```
 
-### Yêu cầu hệ thống
-- AI Agent Mode cần cấu hình đầy đủ các action trong file cấu hình
-- Direct Chat Mode phù hợp cho môi trường có tài nguyên hạn chế
-- Lịch sử chat được lưu trữ trong database cho cả hai chế độ
+**Response:**
+```json
+{
+  "id": "msg_123",
+  "message": "Tôi nên uống bao nhiêu nước mỗi ngày?",
+  "response": "Dựa trên thông tin của bạn, bạn nên uống khoảng 2-2.5 lít nước mỗi ngày. Điều này phụ thuộc vào cân nặng, mức độ hoạt động và khí hậu. Tôi khuyên bạn nên uống nước đều đặn trong ngày, đặc biệt là trước và sau khi tập luyện.",
+  "context": "nutrition_advice",
+  "timestamp": "2024-01-15T10:30:00.000Z",
+  "aiModel": "gpt-4o",
+  "tokensUsed": 150,
+  "costUsd": 0.0045
+}
+```
 
-### Khuyến nghị sử dụng
-- Sử dụng Direct Chat Mode cho người dùng mới và tư vấn chung
-- Chuyển sang AI Agent Mode khi người dùng đã quen thuộc
-- Kết hợp cả hai chế độ để tối ưu trải nghiệm người dùng
+### 2. Lấy lịch sử chat
+**Endpoint:** `GET /ai-assistant/chat-history`
 
-### Tài liệu kỹ thuật
-Chi tiết kỹ thuật và API documentation được cung cấp trong Swagger tại `/api-docs`
+**Mô tả:** Lấy lịch sử chat của người dùng
+
+**Parameters:**
+- `limit` (query): `number` - Số lượng tin nhắn tối đa (mặc định: 50)
+- `offset` (query): `number` - Vị trí bắt đầu (mặc định: 0)
+
+**Response:**
+```json
+{
+  "messages": [
+    {
+      "id": "msg_123",
+      "message": "Tôi nên uống bao nhiêu nước mỗi ngày?",
+      "response": "Dựa trên thông tin của bạn...",
+      "context": "nutrition_advice",
+      "timestamp": "2024-01-15T10:30:00.000Z"
+    }
+  ],
+  "total": 25,
+  "hasMore": true
+}
+```
+
+### 3. Xóa lịch sử chat
+**Endpoint:** `DELETE /ai-assistant/chat-history`
+
+**Mô tả:** Xóa toàn bộ lịch sử chat của người dùng
+
+**Response:**
+```json
+{
+  "message": "Đã xóa lịch sử chat thành công",
+  "deletedCount": 25
+}
+```
+
+### 4. Lấy gợi ý câu hỏi
+**Endpoint:** `GET /ai-assistant/suggestions`
+
+**Mô tả:** Lấy danh sách câu hỏi gợi ý
+
+**Parameters:**
+- `category` (query): `string` - Danh mục gợi ý (nutrition, exercise, health, general)
+
+**Response:**
+```json
+{
+  "suggestions": [
+    {
+      "id": "sug_1",
+      "question": "Tôi nên ăn gì trước khi tập luyện?",
+      "category": "nutrition",
+      "description": "Lời khuyên về dinh dưỡng trước tập luyện"
+    },
+    {
+      "id": "sug_2", 
+      "question": "Làm thế nào để tăng cơ bắp hiệu quả?",
+      "category": "exercise",
+      "description": "Hướng dẫn tập luyện tăng cơ"
+    }
+  ]
+}
+```
+
+### 5. Hỏi câu hỏi nhanh
+**Endpoint:** `POST /ai-assistant/ask`
+
+**Mô tả:** Hỏi câu hỏi nhanh không cần lưu vào lịch sử
+
+**Request Body:**
+```json
+{
+  "question": "Calo trong 1 quả chuối là bao nhiêu?",
+  "includeContext": false
+}
+```
+
+**Response:**
+```json
+{
+  "question": "Calo trong 1 quả chuối là bao nhiêu?",
+  "answer": "Một quả chuối trung bình (khoảng 118g) chứa khoảng 105 calo. Chuối cũng chứa nhiều chất dinh dưỡng quan trọng như kali, vitamin B6, và chất xơ.",
+  "source": "nutrition_database",
+  "confidence": 0.95
+}
+```
+
+### 6. Kiểm tra trạng thái Assistant
+**Endpoint:** `GET /ai-assistant/status`
+
+**Mô tả:** Kiểm tra trạng thái AI Assistant
+
+**Response:**
+```json
+{
+  "isAvailable": true,
+  "message": "AI Assistant đang hoạt động bình thường",
+  "config": {
+    "model": "gpt-4o",
+    "maxTokens": "1000",
+    "temperature": "0.8"
+  },
+  "stats": {
+    "totalConversations": 1250,
+    "averageResponseTime": 2.5,
+    "userSatisfaction": 4.2
+  }
+}
+```
+
+## Cấu hình
+
+### Environment Variables
+```env
+OPENAI_API_KEY=your_openai_api_key
+OPENAI_MODEL=gpt-4o
+OPENAI_MAX_TOKENS=1000
+OPENAI_TEMPERATURE=0.8
+```
+
+### AI Configuration
+- **Model**: GPT-4o (mặc định) hoặc GPT-3.5-turbo
+- **Max Tokens**: 1000 (phù hợp cho chat)
+- **Temperature**: 0.8 (thân thiện và sáng tạo hơn)
+
+## Luồng xử lý chi tiết
+
+### 1. Chat Flow
+```
+1. Nhận tin nhắn từ người dùng
+2. Lấy lịch sử chat gần đây (context)
+3. Chuẩn bị prompt với context
+4. Gửi lên OpenAI
+5. Lưu tin nhắn và phản hồi vào database
+6. Trả về phản hồi cho người dùng
+```
+
+### 2. Context Management
+```
+1. Phân tích tin nhắn để xác định chủ đề
+2. Lấy lịch sử chat liên quan
+3. Tạo context summary
+4. Đưa context vào prompt
+```
+
+## Prompt Templates
+
+### Chat Prompt
+```
+Bạn là một trợ lý dinh dưỡng và sức khỏe thông minh. Hãy trả lời câu hỏi của người dùng một cách thân thiện và chuyên nghiệp.
+
+Context trước đó:
+{chatHistory}
+
+Câu hỏi hiện tại: {currentMessage}
+
+Hãy trả lời ngắn gọn, chính xác và hữu ích.
+```
+
+### Quick Question Prompt
+```
+Trả lời câu hỏi sau một cách ngắn gọn và chính xác:
+{question}
+
+Chỉ trả lời thông tin cần thiết, không cần giải thích dài dòng.
+```
+
+## Database Schema
+
+### ChatMessage Entity
+```typescript
+{
+  id: string;
+  userId: number;
+  message: string;
+  response: string;
+  context?: string;
+  timestamp: Date;
+  tokensUsed: number;
+  costUsd: number;
+  aiModel: string;
+}
+```
+
+## Error Handling
+
+### OpenAI Errors
+- **API Key Missing**: Trả về lỗi "AI Assistant không khả dụng"
+- **Network Error**: Thông báo lỗi kết nối
+- **Rate Limit**: Thông báo quá tải và yêu cầu thử lại
+
+### User Input Errors
+- **Empty Message**: Yêu cầu nhập tin nhắn
+- **Message Too Long**: Giới hạn độ dài tin nhắn
+- **Invalid Context**: Xử lý context không hợp lệ
+
+## Monitoring & Analytics
+
+### Metrics
+- **Conversation Count**: Số lượng cuộc hội thoại
+- **Response Time**: Thời gian phản hồi trung bình
+- **User Satisfaction**: Đánh giá từ người dùng
+- **Token Usage**: Số token sử dụng
+- **Cost Tracking**: Chi phí OpenAI
+
+### Logging
+- **Chat Logs**: Log tất cả cuộc hội thoại
+- **Error Logs**: Log các lỗi
+- **Performance Logs**: Log thời gian xử lý
+
+## Best Practices
+
+### Performance
+- Giới hạn context length để tối ưu token usage
+- Cache các câu trả lời phổ biến
+- Batch processing cho multiple requests
+
+### User Experience
+- Phản hồi nhanh chóng (< 3 giây)
+- Câu trả lời ngắn gọn, dễ hiểu
+- Gợi ý câu hỏi tiếp theo
+- Lưu trữ lịch sử để context
+
+### Security
+- Sanitize user input
+- Rate limiting cho API calls
+- Không lưu thông tin nhạy cảm
+
+## Use Cases
+
+### 1. Tư vấn dinh dưỡng
+- **Calorie Calculation**: Tính toán calo cho món ăn
+- **Meal Planning**: Gợi ý thực đơn
+- **Nutrition Facts**: Thông tin dinh dưỡng
+
+### 2. Tư vấn tập luyện
+- **Exercise Guidance**: Hướng dẫn bài tập
+- **Workout Planning**: Lập kế hoạch tập luyện
+- **Recovery Advice**: Lời khuyên phục hồi
+
+### 3. Tư vấn sức khỏe
+- **Health Questions**: Câu hỏi về sức khỏe
+- **Symptom Analysis**: Phân tích triệu chứng
+- **Lifestyle Advice**: Lời khuyên lối sống
+
+### 4. Hỗ trợ chung
+- **App Usage**: Hướng dẫn sử dụng app
+- **Feature Explanation**: Giải thích tính năng
+- **Troubleshooting**: Xử lý sự cố
+
+## Future Enhancements
+
+### Planned Features
+- **Voice Chat**: Hỗ trợ chat bằng giọng nói
+- **Multi-language**: Hỗ trợ nhiều ngôn ngữ
+- **Image Analysis**: Phân tích hình ảnh thực phẩm
+- **Personalization**: Tùy chỉnh theo người dùng
+
+### Integration Opportunities
+- **Notification System**: Gửi lời nhắc thông minh
+- **Goal Integration**: Liên kết với mục tiêu người dùng
+- **Social Features**: Chia sẻ insights với cộng đồng

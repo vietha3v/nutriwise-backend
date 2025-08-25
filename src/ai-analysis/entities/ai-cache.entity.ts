@@ -60,11 +60,11 @@ export class AiCache {
   isExpired: boolean;
 
   @ApiProperty({ description: 'Creation timestamp' })
-  @CreateDateColumn()
+  @CreateDateColumn({ type: 'timestamp with time zone' })
   createdAt: Date;
 
   @ApiProperty({ description: 'Last update timestamp' })
-  @UpdateDateColumn()
+  @UpdateDateColumn({ type: 'timestamp with time zone' })
   updatedAt: Date;
 
   @ManyToOne('User', 'aiCaches')

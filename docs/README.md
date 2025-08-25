@@ -30,7 +30,7 @@
 - [8. Dashboard và thống kê](./08-dashboard.md) - Tổng quan, biểu đồ, báo cáo
 
 ### 🤖 AI & Tư vấn
-- [9. AI Personal Trainer & Nutritionist](./09-ai-personal-trainer.md) - AI phân tích profile và gợi ý mục tiêu
+- [9. AI Analysis](./09-ai-analysis.md) - Phân tích dữ liệu thông minh với OpenAI GPT
 - [13. AI Assistant - Trợ lý ảo](./13-ai-assistant.md) - Chatbot tư vấn dinh dưỡng, hỗ trợ người dùng
 
 ### 📧 Thông báo
@@ -78,7 +78,7 @@ docs/
 ├── 06-exercise-management.md    # Module 6: Quản lý tập luyện
 ├── 07-goals.md                  # Module 7: Mục tiêu
 ├── 08-dashboard.md              # Module 8: Dashboard và thống kê
-├── 09-ai-personal-trainer.md    # Module 9: AI Personal Trainer
+├── 09-ai-analysis.md            # Module 9: AI Analysis
 ├── 10-email.md                  # Module 10: Gửi email
 ├── 11-trainer-relationship.md   # Module 11: Trainer-User Relationship
 ├── 12-wallet-payment.md         # Module 12: Wallet & Payment

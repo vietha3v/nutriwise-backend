@@ -19,13 +19,14 @@ import { WaterIntake } from './water/entities/water-intake.entity';
 import { Exercise } from './exercise/entities/exercise.entity';
 import { Goal } from './goals/entities/goal.entity';
 
-import { AiCache } from './ai/entities/ai-cache.entity';
+import { AiCache } from './ai-analysis/entities/ai-cache.entity';
 import { UserPlatform } from './ai-assistant/entities/user-platform.entity';
 import { ChatMessage } from './ai-assistant/entities/chat-message.entity';
 import { Food } from './food/entities/food.entity';
 import { UserFoodPreference } from './food/entities/user-food-preference.entity';
 import { DailyFoodAvailability } from './food/entities/daily-food-availability.entity';
 import { MealSuggestion } from './food/entities/meal-suggestion.entity';
+import { UserSettings } from './settings/entities/user-settings.entity';
 
 // Feature modules
 import { AuthModule } from './auth/auth.module';
@@ -38,9 +39,10 @@ import { GoalsModule } from './goals/goals.module';
 
 import { EmailModule } from './email/email.module';
 import { DashboardModule } from './dashboard/dashboard.module';
-import { AiModule } from './ai/ai.module';
+import { AiAnalysisModule } from './ai-analysis/ai-analysis.module';
 import { AiAssistantModule } from './ai-assistant/ai-assistant.module';
 import { FoodModule } from './food/food.module';
+import { SettingsModule } from './settings/settings.module';
 
 @Module({
   imports: [
@@ -64,7 +66,6 @@ import { FoodModule } from './food/food.module';
         WaterIntake, 
         Exercise, 
         Goal,
-
         AiCache,
         UserPlatform,
         ChatMessage,
@@ -72,8 +73,9 @@ import { FoodModule } from './food/food.module';
         UserFoodPreference,
         DailyFoodAvailability,
         MealSuggestion,
+        UserSettings,
       ],
-      synchronize: false,
+      synchronize: true,
       logging: process.env.DEBUG_DATABASE === 'true',
     }),
     JwtModule.register({
@@ -95,9 +97,10 @@ import { FoodModule } from './food/food.module';
 
     EmailModule,
     DashboardModule,
-    AiModule,
+    AiAnalysisModule,
     AiAssistantModule,
     FoodModule,
+    SettingsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -33,7 +33,7 @@ export class UserPlatform {
   @Column({ nullable: true })
   verifiedAt: Date;
 
-  @CreateDateColumn()
+  @CreateDateColumn({ type: 'timestamp with time zone' })
   createdAt: Date;
 
   @ManyToOne(() => User)

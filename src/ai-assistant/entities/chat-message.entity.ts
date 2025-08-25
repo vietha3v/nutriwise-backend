@@ -46,6 +46,6 @@ export class ChatMessage {
   @Column({ nullable: true })
   mediaUrl: string;
 
-  @CreateDateColumn()
+  @CreateDateColumn({ type: 'timestamp with time zone' })
   createdAt: Date;
 }
