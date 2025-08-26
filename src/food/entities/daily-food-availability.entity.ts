@@ -38,11 +38,11 @@ export class DailyFoodAvailability {
   notes: string;
 
   @ApiProperty({ description: 'Thời gian tạo' })
-  @CreateDateColumn()
+  @CreateDateColumn({ type: 'timestamp with time zone' })
   createdAt: Date;
 
   @ApiProperty({ description: 'Thời gian cập nhật' })
-  @UpdateDateColumn()
+  @UpdateDateColumn({ type: 'timestamp with time zone' })
   updatedAt: Date;
 
   @ManyToOne('User', 'dailyFoodAvailabilities')

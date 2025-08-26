@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AiAnalysisController } from './ai-analysis.controller';
 import { AiAnalysisService } from './ai-analysis.service';
@@ -10,7 +10,7 @@ import { ProfileModule } from '../profile/profile.module';
   imports: [
     TypeOrmModule.forFeature([AiCache]),
     WaterModule,
-    ProfileModule
+    forwardRef(() => ProfileModule)
   ],
   controllers: [AiAnalysisController],
   providers: [AiAnalysisService],

@@ -1,72 +1,99 @@
-import { IsString, IsNumber, IsEnum, IsArray, IsOptional, IsDecimal } from 'class-validator';
+import { IsString, IsNumber, IsEnum, IsArray, IsOptional, IsDecimal, IsDateString } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { Gender, ActivityLevel, GoalType } from '../../common/enums/role.enum';
 
 export class CreateProfileDto {
   @ApiProperty({ 
     description: 'Tên của người dùng',
-    example: 'Nguyễn'
+    example: 'Nguyễn',
+    required: false
   })
   @IsString()
-  firstName: string;
+  @IsOptional()
+  firstName?: string;
 
   @ApiProperty({ 
     description: 'Họ của người dùng',
-    example: 'Văn A'
+    example: 'Văn A',
+    required: false
   })
   @IsString()
-  lastName: string;
+  @IsOptional()
+  lastName?: string;
 
   @ApiProperty({ 
     description: 'Tuổi của người dùng',
     example: 25,
     minimum: 1,
-    maximum: 120
+    maximum: 120,
+    required: false
   })
   @IsNumber()
-  age: number;
+  @IsOptional()
+  age?: number;
 
   @ApiProperty({ 
     description: 'Chiều cao (cm)',
     example: 170,
     minimum: 50,
-    maximum: 250
+    maximum: 250,
+    required: false
   })
   @IsNumber()
-  height: number;
+  @IsOptional()
+  height?: number;
 
   @ApiProperty({ 
     description: 'Cân nặng (kg)',
     example: 65,
     minimum: 20,
-    maximum: 300
+    maximum: 300,
+    required: false
   })
   @IsNumber()
-  weight: number;
+  @IsOptional()
+  weight?: number;
+
+  @ApiProperty({ 
+    description: 'Cân nặng mục tiêu (kg)',
+    example: 60,
+    minimum: 20,
+    maximum: 300,
+    required: false
+  })
+  @IsNumber()
+  @IsOptional()
+  goalWeight?: number;
 
   @ApiProperty({ 
     enum: Gender, 
     description: 'Giới tính của người dùng',
-    example: Gender.Male
+    example: Gender.Male,
+    required: false
   })
   @IsEnum(Gender)
-  gender: Gender;
+  @IsOptional()
+  gender?: Gender;
 
   @ApiProperty({ 
     enum: ActivityLevel, 
     description: 'Mức độ hoạt động',
-    example: ActivityLevel.ModeratelyActive
+    example: ActivityLevel.ModeratelyActive,
+    required: false
   })
   @IsEnum(ActivityLevel)
-  activityLevel: ActivityLevel;
+  @IsOptional()
+  activityLevel?: ActivityLevel;
 
   @ApiProperty({ 
     enum: GoalType, 
     description: 'Loại mục tiêu thể hình',
-    example: GoalType.WeightLoss
+    example: GoalType.WeightLoss,
+    required: false
   })
   @IsEnum(GoalType)
-  goalType: GoalType;
+  @IsOptional()
+  goalType?: GoalType;
 
   @ApiProperty({ 
     type: [String], 
@@ -77,6 +104,15 @@ export class CreateProfileDto {
   @IsArray()
   @IsOptional()
   personalGoals?: string[];
+
+  @ApiProperty({ 
+    description: 'Ngày tạo profile (ISO date string)',
+    required: false,
+    example: '2024-01-15T00:00:00.000Z'
+  })
+  @IsDateString()
+  @IsOptional()
+  createdAt?: string;
 
   // === CHỈ SỐ INBODY ===
   

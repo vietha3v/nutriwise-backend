@@ -125,7 +125,7 @@ export class FoodService {
     date: Date,
     mealType: string,
     suggestion: any,
-    source: 'gpt' | 'fallback',
+    source: 'manual' | 'system',
   ): Promise<MealSuggestion> {
     const existingSuggestion = await this.mealSuggestionRepository.findOne({
       where: { userId, date, mealType },
@@ -167,40 +167,5 @@ export class FoodService {
     return await this.mealSuggestionRepository.save(suggestion);
   }
 
-  async getDataForAI(userId: number, date: Date): Promise<{
-    availableFoods: any[];
-    userPreferences: any[];
-    profile: any;
-  }> {
-    const [preferences, availability, profile] = await Promise.all([
-      this.userFoodPreferenceRepository.find({
-        where: { userId },
-        relations: ['food'],
-      }),
-      this.dailyFoodAvailabilityRepository.find({
-        where: { userId, date },
-      }),
-      this.profileRepository.findOne({ where: { userId } }),
-    ]);
 
-    // Extract available foods from availability data
-    const availableFoods = availability.flatMap(avail => 
-      avail.availableFoods.map(food => ({
-        foodId: food.foodId,
-        foodName: food.foodName,
-        quantity: food.quantity,
-        unit: food.unit,
-      }))
-    );
-
-    return {
-      availableFoods,
-      userPreferences: preferences.map(pref => ({
-        food: pref.food,
-        preferenceLevel: pref.preferenceLevel,
-        isAllergic: pref.isAllergic,
-      })),
-      profile,
-    };
-  }
 } 

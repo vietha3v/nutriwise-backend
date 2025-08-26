@@ -14,19 +14,19 @@ export class Profile {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ nullable: true })
   firstName: string;
 
-  @Column()
+  @Column({ nullable: true })
   lastName: string;
 
-  @Column({ type: 'integer' })
+  @Column({ type: 'integer', nullable: true })
   age: number;
 
-  @Column({ type: 'decimal', precision: 5, scale: 2 })
+  @Column({ type: 'decimal', precision: 5, scale: 2, nullable: true })
   height: number; // in cm
 
-  @Column({ type: 'decimal', precision: 5, scale: 2 })
+  @Column({ type: 'decimal', precision: 5, scale: 2, nullable: true })
   weight: number; // in kg
 
   @Column({ type: 'decimal', precision: 5, scale: 2, nullable: true })
@@ -35,18 +35,21 @@ export class Profile {
   @Column({
     type: 'enum',
     enum: Gender,
+    nullable: true,
   })
   gender: Gender;
 
   @Column({
     type: 'enum',
     enum: ActivityLevel,
+    nullable: true,
   })
   activityLevel: ActivityLevel;
 
   @Column({
     type: 'enum',
     enum: GoalType,
+    nullable: true,
   })
   goalType: GoalType;
 
@@ -167,10 +170,10 @@ export class Profile {
   @Column({ default: false })
   isDeleted: boolean;
 
-  @CreateDateColumn()
+  @CreateDateColumn({ type: 'timestamp with time zone' })
   createdAt: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ type: 'timestamp with time zone' })
   updatedAt: Date;
 
   @ManyToOne('User', 'profiles', { onDelete: 'CASCADE' })

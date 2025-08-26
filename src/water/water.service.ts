@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, Inject, forwardRef } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Between } from 'typeorm';
 import { WaterIntake } from './entities/water-intake.entity';
@@ -82,6 +82,7 @@ export class WaterService {
   constructor(
     @InjectRepository(WaterIntake)
     private waterIntakeRepository: Repository<WaterIntake>,
+    @Inject(forwardRef(() => ProfileService))
     private profileService: ProfileService,
   ) {}
 

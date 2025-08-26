@@ -47,10 +47,10 @@ export class Exercise {
   @Column({ default: false })
   isDeleted: boolean;
 
-  @CreateDateColumn()
+  @CreateDateColumn({ type: 'timestamp with time zone' })
   createdAt: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ type: 'timestamp with time zone' })
   updatedAt: Date;
 
   @ManyToOne('User', 'exercises', { onDelete: 'CASCADE' })

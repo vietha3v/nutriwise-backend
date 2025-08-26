@@ -95,14 +95,14 @@ export class Goal {
     description: 'Thời gian tạo mục tiêu',
     example: new Date().toISOString()
   })
-  @CreateDateColumn()
+  @CreateDateColumn({ type: 'timestamp with time zone' })
   createdAt: Date;
 
   @ApiProperty({ 
     description: 'Thời gian cập nhật cuối',
     example: new Date().toISOString()
   })
-  @UpdateDateColumn()
+  @UpdateDateColumn({ type: 'timestamp with time zone' })
   updatedAt: Date;
 
   @Column({ type: 'int', nullable: true })

@@ -22,9 +22,14 @@ export class ExerciseService {
     return await this.exerciseRepository.save(exercise);
   }
 
-  async findAll(): Promise<Exercise[]> {
+  async findAll(userId?: number): Promise<Exercise[]> {
+    const whereCondition: any = { isDeleted: false };
+    if (userId) {
+      whereCondition.userId = userId;
+    }
+    
     return await this.exerciseRepository.find({
-      where: { isDeleted: false },
+      where: whereCondition,
       order: { createdAt: 'DESC' },
     });
   }
@@ -54,5 +59,52 @@ export class ExerciseService {
     await this.exerciseRepository.save(exercise);
   }
 
+  async getExerciseGoals(userId: number): Promise<any> {
+    // Lấy profile người dùng để xem mục tiêu tập luyện
+    const profile = await this.profileRepository.findOne({ where: { userId } });
+    
+    // Lấy các bài tập gần đây
+    const recentExercises = await this.exerciseRepository.find({
+      where: { userId, isDeleted: false },
+      order: { createdAt: 'DESC' },
+      take: 10,
+    });
 
+    // Tính toán thống kê cơ bản
+    const totalExercises = recentExercises.length;
+    const totalCaloriesBurned = recentExercises.reduce((sum, exercise) => sum + (exercise.caloriesBurned || 0), 0);
+    const averageCaloriesPerExercise = totalExercises > 0 ? totalCaloriesBurned / totalExercises : 0;
+
+    return {
+      profile: {
+        goalType: profile?.goalType || 'maintenance',
+        activityLevel: profile?.activityLevel || 'moderate',
+      },
+      goals: {
+        weeklyWorkouts: 3, // Mục tiêu mặc định
+        weeklyCalories: 1500, // Mục tiêu mặc định
+        currentWeekProgress: {
+          workoutsCompleted: totalExercises,
+          caloriesBurned: totalCaloriesBurned,
+        },
+      },
+      recentActivity: {
+        totalExercises,
+        totalCaloriesBurned,
+        averageCaloriesPerExercise,
+        exercises: recentExercises.map(exercise => ({
+          id: exercise.id,
+          name: exercise.name,
+          duration: exercise.duration,
+          caloriesBurned: exercise.caloriesBurned,
+          date: exercise.date,
+        })),
+      },
+      recommendations: [
+        'Tập luyện đều đặn 3-5 lần/tuần',
+        'Kết hợp cardio và strength training',
+        'Nghỉ ngơi đầy đủ giữa các buổi tập',
+      ],
+    };
+  }
 } 

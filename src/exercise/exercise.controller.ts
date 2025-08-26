@@ -37,7 +37,7 @@ export class ExerciseController {
   @ApiResponse({ status: 200, description: 'List of exercise records' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   findAll(@Request() req) {
-    return this.exerciseService.findAll();
+    return this.exerciseService.findAll(req.user.userId);
   }
 
   @Get('goals')

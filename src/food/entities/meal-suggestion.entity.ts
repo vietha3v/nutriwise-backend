@@ -51,7 +51,7 @@ export class MealSuggestion {
 
   @ApiProperty({ description: 'Nguồn gợi ý' })
   @Column()
-  source: string; // 'gpt', 'fallback'
+  source: string; // 'manual', 'system'
 
   @ApiProperty({ description: 'Người dùng đã chọn gợi ý này' })
   @Column({ default: false })
@@ -66,11 +66,11 @@ export class MealSuggestion {
   userFeedback: string;
 
   @ApiProperty({ description: 'Thời gian tạo' })
-  @CreateDateColumn()
+  @CreateDateColumn({ type: 'timestamp with time zone' })
   createdAt: Date;
 
   @ApiProperty({ description: 'Thời gian cập nhật' })
-  @UpdateDateColumn()
+  @UpdateDateColumn({ type: 'timestamp with time zone' })
   updatedAt: Date;
 
   @ManyToOne('User', 'mealSuggestions')

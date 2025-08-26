@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, Inject, forwardRef } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ConfigService } from '@nestjs/config';
@@ -22,6 +22,7 @@ export class AiAnalysisService {
     private aiCacheRepository: Repository<AiCache>,
     private configService: ConfigService,
     private waterService: WaterService,
+    @Inject(forwardRef(() => ProfileService))
     private profileService: ProfileService,
   ) {
     // Load AI configuration from environment variables
@@ -112,6 +113,180 @@ export class AiAnalysisService {
       this.logger.error(`Error analyzing profile: ${error.message}`);
       throw error;
     }
+  }
+
+  // === IDEAL STANDARDS CALCULATION ===
+  async calculateIdealStandards(userId: number, forceRefresh?: boolean): Promise<any> {
+    if (!this.openai) {
+      throw new Error('OpenAI không được khởi tạo. Vui lòng kiểm tra API key.');
+    }
+
+    try {
+      // Check cache first (unless force refresh)
+      if (!forceRefresh) {
+        const cachedResult = await this.getCachedResult(userId, 'ideal_standards', { forceRefresh });
+        
+        if (cachedResult) {
+          this.logger.log(`Using cached ideal standards for user ${userId}`);
+          return cachedResult;
+        }
+      }
+
+      const profile = await this.profileService.findByUserId(userId);
+      if (!profile) {
+        throw new Error('Không tìm thấy profile người dùng');
+      }
+
+      // Prepare data for OpenAI
+      const standardsData = {
+        profile: {
+          age: profile.age,
+          gender: profile.gender,
+          height: profile.height,
+          weight: profile.weight,
+          activityLevel: profile.activityLevel,
+          goalType: profile.goalType,
+          bodyFatPercentage: profile.bodyFatPercentage,
+          skeletalMuscleMass: profile.skeletalMuscleMass,
+          bmi: profile.bmi,
+          visceralFatLevel: profile.visceralFatLevel,
+          totalBodyWater: profile.totalBodyWater,
+          intracellularWater: profile.intracellularWater,
+          extracellularWater: profile.extracellularWater,
+          icwEcwRatio: profile.icwEcwRatio,
+          ffmi: profile.ffmi,
+          bmr: profile.bmr,
+          tdee: profile.tdee
+        }
+      };
+
+      // Clean data before sending to AI
+      const cleanedData = this.cleanDataForAI('ideal_standards', standardsData);
+
+      // Send to OpenAI for calculation
+      const aiResponse = await this.sendToOpenAI('ideal_standards', cleanedData);
+
+      // Parse AI response to get ideal standards profile
+      let idealStandardsProfile;
+      try {
+        // Try to parse JSON from AI response
+        const jsonMatch = aiResponse.analysis.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          idealStandardsProfile = JSON.parse(jsonMatch[0]);
+        } else {
+          throw new Error('Không thể parse JSON từ AI response');
+        }
+      } catch (parseError) {
+        this.logger.error(`Error parsing AI response: ${parseError.message}`);
+        // Fallback to basic calculations if AI fails
+        idealStandardsProfile = this.calculateBasicIdealStandards(profile);
+      }
+
+      // Ensure all required fields are present
+      const completeIdealProfile = {
+        id: null,
+        firstName: "Chỉ số lý tưởng",
+        lastName: "",
+        age: profile.age,
+        gender: profile.gender,
+        height: profile.height,
+        weight: idealStandardsProfile.weight || 0,
+        bodyFatPercentage: idealStandardsProfile.bodyFatPercentage || 0,
+        skeletalMuscleMass: idealStandardsProfile.skeletalMuscleMass || 0,
+        visceralFat: idealStandardsProfile.visceralFat || 0,
+        visceralFatLevel: idealStandardsProfile.visceralFatLevel || 0,
+        totalBodyWater: idealStandardsProfile.totalBodyWater || 0,
+        intracellularWater: idealStandardsProfile.intracellularWater || 0,
+        extracellularWater: idealStandardsProfile.extracellularWater || 0,
+        icwEcwRatio: idealStandardsProfile.icwEcwRatio || 0,
+        ffmi: idealStandardsProfile.ffmi || 0,
+        bmr: idealStandardsProfile.bmr || 0,
+        tdee: idealStandardsProfile.tdee || 0,
+        bmi: idealStandardsProfile.bmi || 0,
+        activityLevel: profile.activityLevel,
+        goalType: profile.goalType,
+        dailyWaterGoal: idealStandardsProfile.dailyWaterGoal || 0,
+        allergies: [],
+        medicalConditions: [],
+        healthIssues: [],
+        notes: "Đây là các chỉ số lý tưởng được tính toán dựa trên đặc điểm cá nhân",
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        isDeleted: false,
+        userId: userId
+      };
+
+      const result = {
+        standards: completeIdealProfile,
+        dataSummary: {
+          profile: standardsData.profile
+        },
+        generatedAt: new Date().toISOString(),
+        aiModel: this.aiConfig.model
+      };
+
+      // Cache the result
+      await this.cacheResult(userId, 'ideal_standards', { forceRefresh }, result, aiResponse.tokensUsed, aiResponse.costUsd);
+
+      return result;
+    } catch (error) {
+      this.logger.error(`Error calculating ideal standards: ${error.message}`);
+      throw error;
+    }
+  }
+
+  // Fallback method for basic ideal standards calculation
+  private calculateBasicIdealStandards(profile: any): any {
+    const heightInMeters = profile.height / 100;
+    
+    // Basic BMI calculation (18.5-24.9)
+    const idealBMIMin = 18.5;
+    const idealBMIMax = profile.gender === 'Male' ? 25.0 : 24.0;
+    const idealWeightMin = idealBMIMin * heightInMeters * heightInMeters;
+    const idealWeightMax = idealBMIMax * heightInMeters * heightInMeters;
+    const idealWeight = (idealWeightMin + idealWeightMax) / 2;
+
+    // Basic body fat calculation
+    const idealBodyFatPercentage = profile.gender === 'Male' ? 15 : 25;
+    
+    // Basic muscle mass calculation
+    const musclePercentage = profile.gender === 'Male' ? 0.45 : 0.35;
+    const idealMuscleMass = idealWeight * musclePercentage;
+
+    // Basic water calculation
+    const idealWaterPercentage = 0.55;
+    const idealTotalWater = idealWeight * idealWaterPercentage;
+
+    // Basic BMR calculation
+    const idealBMR = 10 * idealWeight + 6.25 * profile.height - 5 * profile.age;
+    const adjustedBMR = profile.gender === 'Male' ? idealBMR + 5 : idealBMR - 161;
+
+    // Basic TDEE calculation
+    const activityMultipliers = {
+      'Sedentary': 1.2,
+      'LightlyActive': 1.375,
+      'ModeratelyActive': 1.55,
+      'VeryActive': 1.725,
+      'ExtremelyActive': 1.9,
+    };
+    const multiplier = activityMultipliers[profile.activityLevel] || 1.2;
+    const idealTDEE = Math.round(adjustedBMR * multiplier);
+
+    return {
+      weight: Math.round(idealWeight * 10) / 10,
+      bodyFatPercentage: idealBodyFatPercentage,
+      skeletalMuscleMass: Math.round(idealMuscleMass * 10) / 10,
+      visceralFatLevel: 5,
+      totalBodyWater: Math.round(idealTotalWater * 10) / 10,
+      intracellularWater: Math.round(idealTotalWater * 0.67 * 10) / 10,
+      extracellularWater: Math.round(idealTotalWater * 0.33 * 10) / 10,
+      icwEcwRatio: 1.0,
+      ffmi: Math.round((idealWeight * (1 - idealBodyFatPercentage / 100)) / (heightInMeters * heightInMeters) * 10) / 10,
+      bmr: Math.round(adjustedBMR),
+      tdee: idealTDEE,
+      bmi: Math.round((idealWeight / (heightInMeters * heightInMeters)) * 10) / 10,
+      dailyWaterGoal: Math.round(idealTotalWater * 1000) // Convert to ml
+    };
   }
 
   // === HYDRATION EXPERT ANALYSIS ===
@@ -275,6 +450,10 @@ export class AiAnalysisService {
         cleaned.profile = this.cleanProfileDataForAI(data.profile);
         break;
 
+      case 'ideal_standards':
+        cleaned.profile = this.cleanProfileDataForAI(data.profile);
+        break;
+
       case 'hydration_expert_analysis':
         cleaned.period = data.period;
         cleaned.analysisType = data.analysisType;
@@ -303,6 +482,47 @@ Bao gồm:
 - Xác định vấn đề cần cải thiện
 - Khuyến nghị dinh dưỡng và lối sống`;
 
+      case 'ideal_standards':
+        return `Bạn là chuyên gia dinh dưỡng và thể dục hàng đầu, có bằng cấp về dinh dưỡng học và y học thể thao. Bạn chuyên sâu về tính toán các chỉ số lý tưởng dựa trên đặc điểm cá nhân.
+
+Dựa trên profile sức khỏe của người dùng, hãy tính toán các chỉ số lý tưởng. Trả về kết quả dưới dạng JSON với cấu trúc giống hệt một profile thật, nhưng đây là các chỉ số mẫu lý tưởng.
+
+Cấu trúc JSON trả về phải có đầy đủ các trường như một profile:
+{
+  "id": null,
+  "firstName": "Chỉ số lý tưởng",
+  "lastName": "",
+  "age": [tuổi người dùng],
+  "gender": "[giới tính người dùng]",
+  "height": [chiều cao người dùng],
+  "weight": [cân nặng lý tưởng],
+  "bodyFatPercentage": [tỷ lệ mỡ lý tưởng],
+  "skeletalMuscleMass": [khối lượng cơ xương lý tưởng],
+  "visceralFat": [mỡ nội tạng lý tưởng],
+  "visceralFatLevel": [chỉ số mỡ nội tạng lý tưởng],
+  "totalBodyWater": [tổng lượng nước lý tưởng],
+  "intracellularWater": [nước nội bào lý tưởng],
+  "extracellularWater": [nước ngoại bào lý tưởng],
+  "icwEcwRatio": [tỷ lệ ICW/ECW lý tưởng],
+  "ffmi": [FFMI lý tưởng],
+  "bmr": [BMR lý tưởng],
+  "tdee": [TDEE lý tưởng],
+  "bmi": [BMI lý tưởng],
+  "activityLevel": "[mức độ hoạt động người dùng]",
+  "goalType": "[mục tiêu người dùng]",
+  "dailyWaterGoal": [mục tiêu nước lý tưởng],
+  "allergies": [],
+  "medicalConditions": [],
+  "healthIssues": [],
+  "notes": "Đây là các chỉ số lý tưởng được tính toán dựa trên đặc điểm cá nhân",
+  "createdAt": "[timestamp hiện tại]",
+  "updatedAt": "[timestamp hiện tại]",
+  "isDeleted": false,
+  "userId": [userId người dùng]
+}
+
+Sử dụng các công thức y học chuẩn và điều chỉnh theo tuổi, giới tính, chiều cao, mức độ hoạt động và mục tiêu của người dùng. Đảm bảo tất cả các giá trị số đều là số thực, không phải string.`;
+
       case 'hydration_expert_analysis':
         return `Bạn là chuyên gia dinh dưỡng và thể dục hàng đầu, có bằng cấp về dinh dưỡng học và y học thể thao. Bạn chuyên sâu về tác động của hydration lên hiệu suất thể thao, chuyển hóa và sức khỏe tổng thể.
 
@@ -329,6 +549,14 @@ Bao gồm:
 ${JSON.stringify(data.profile, null, 2)}
 
 Hãy đưa ra đánh giá chuyên môn, phân tích tình trạng sức khỏe và khuyến nghị cụ thể. Viết như đang khám và tư vấn trực tiếp.`;
+
+      case 'ideal_standards':
+        return `Dựa trên thông tin profile sức khỏe của người dùng, hãy tính toán các chỉ số lý tưởng:
+
+**Thông tin profile:**
+${JSON.stringify(data.profile, null, 2)}
+
+Hãy tính toán các chỉ số lý tưởng dựa trên tuổi, giới tính, chiều cao, mức độ hoạt động và mục tiêu của người dùng. Trả về kết quả dưới dạng JSON với cấu trúc chính xác như đã mô tả.`;
 
       case 'hydration_expert_analysis':
         return `Dựa trên dữ liệu hydration và profile sức khỏe, hãy tạo bài phân tích chuyên sâu như một chuyên gia dinh dưỡng:

@@ -9,33 +9,58 @@ import {
   UseGuards,
   Request,
   Query,
+  NotFoundException,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
 import { ProfileService } from './profile.service';
 import { CreateProfileDto } from './dto/create-profile.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
+import { ProfileResponseDto } from './dto/profile-response.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { Role } from '../common/enums/role.enum';
+import { AiAnalysisService } from '../ai-analysis/ai-analysis.service';
+
+// Helper function to remove sensitive fields from profile response
+function sanitizeProfile(profile: any): ProfileResponseDto {
+  if (!profile) return profile;
+  
+  const { isDeleted, userId, ...sanitizedProfile } = profile;
+  return sanitizedProfile as ProfileResponseDto;
+}
+
+// Helper function to sanitize array of profiles
+function sanitizeProfiles(profiles: any[]): ProfileResponseDto[] {
+  if (!profiles || !Array.isArray(profiles)) return profiles;
+  return profiles.map(sanitizeProfile);
+}
 
 @ApiTags('Profiles')
 @Controller('profiles')
 @UseGuards(JwtAuthGuard, RolesGuard)
 @ApiBearerAuth()
 export class ProfileController {
-  constructor(private readonly profileService: ProfileService) {}
+  constructor(
+    private readonly profileService: ProfileService,
+    private readonly aiAnalysisService: AiAnalysisService
+  ) {}
 
   @Post()
   @ApiOperation({ 
     summary: 'Tạo profile mới',
     description: 'Tạo profile mới để lưu trạng thái cơ thể tại thời điểm hiện tại (cho phép tạo nhiều profile để theo dõi lịch sử thay đổi)'
   })
-  @ApiResponse({ status: 201, description: 'Profile được tạo thành công' })
+  @ApiResponse({ 
+    status: 201, 
+    description: 'Profile được tạo thành công',
+    type: ProfileResponseDto
+  })
   @ApiResponse({ status: 400, description: 'Dữ liệu không hợp lệ' })
   @ApiResponse({ status: 401, description: 'Chưa xác thực' })
-  create(@Body() createProfileDto: CreateProfileDto, @Request() req) {
-    return this.profileService.create(createProfileDto, req.user.userId);
+  async create(@Body() createProfileDto: CreateProfileDto, @Request() req) {
+    const profile = await this.profileService.create(createProfileDto, req.user.userId);
+    return sanitizeProfile(profile);
   }
 
   @Get()
@@ -43,10 +68,15 @@ export class ProfileController {
     summary: 'Lấy danh sách profile của user',
     description: 'Lấy tất cả profile của người dùng đang đăng nhập (sắp xếp theo thời gian, mới nhất trước)'
   })
-  @ApiResponse({ status: 200, description: 'Danh sách profile' })
+  @ApiResponse({ 
+    status: 200, 
+    description: 'Danh sách profile',
+    type: [ProfileResponseDto]
+  })
   @ApiResponse({ status: 401, description: 'Chưa xác thực' })
-  findAll(@Request() req) {
-    return this.profileService.findAll(req.user.userId);
+  async findAll(@Request() req) {
+    const profiles = await this.profileService.findAll(req.user.userId);
+    return sanitizeProfiles(profiles);
   }
 
   @Get('latest')
@@ -54,11 +84,16 @@ export class ProfileController {
     summary: 'Lấy profile mới nhất',
     description: 'Lấy profile mới nhất của người dùng đang đăng nhập'
   })
-  @ApiResponse({ status: 200, description: 'Profile mới nhất' })
+  @ApiResponse({ 
+    status: 200, 
+    description: 'Profile mới nhất',
+    type: ProfileResponseDto
+  })
   @ApiResponse({ status: 404, description: 'Không tìm thấy profile' })
   @ApiResponse({ status: 401, description: 'Chưa xác thực' })
-  findLatestProfile(@Request() req) {
-    return this.profileService.findByUserId(req.user.userId);
+  async findLatestProfile(@Request() req) {
+    const profile = await this.profileService.findByUserId(req.user.userId);
+    return sanitizeProfile(profile);
   }
 
   @Get('compare/:profile1Id/:profile2Id')
@@ -75,7 +110,47 @@ export class ProfileController {
     @Param('profile2Id') profile2Id: string,
     @Request() req
   ) {
-    return await this.profileService.compareProfiles(+profile1Id, +profile2Id, req.user.userId);
+    const result = await this.profileService.compareProfiles(+profile1Id, +profile2Id, req.user.userId);
+    // Sanitize profiles in comparison result
+    if (result.profile1) {
+      result.profile1 = sanitizeProfile(result.profile1) as any;
+    }
+    if (result.profile2) {
+      result.profile2 = sanitizeProfile(result.profile2) as any;
+    }
+    return result;
+  }
+
+  @Get('standards')
+  @ApiOperation({ 
+    summary: 'Lấy chỉ số tiêu chuẩn lý tưởng',
+    description: 'Tính toán các chỉ số tiêu chuẩn dựa trên profile hiện tại bằng AI'
+  })
+  @ApiResponse({ 
+    status: 200, 
+    description: 'Chỉ số tiêu chuẩn',
+    type: ProfileResponseDto
+  })
+  @ApiResponse({ status: 401, description: 'Chưa xác thực' })
+  async getIdealStandards(@Request() req) {
+    try {
+      // Sử dụng AI Analysis Service để tính toán chỉ số lý tưởng
+      const result = await this.aiAnalysisService.calculateIdealStandards(req.user.userId);
+      return sanitizeProfile(result.standards); // Trả về profile lý tưởng đã sanitize
+    } catch (error) {
+      // Fallback to basic calculation if AI fails
+      const latestProfile = await this.profileService.findByUserId(req.user.userId);
+      if (!latestProfile) {
+        throw new NotFoundException('Không tìm thấy profile để tính toán chỉ số tiêu chuẩn');
+      }
+      
+      const standards = this.profileService.calculateIdealStandards(
+        latestProfile.age,
+        latestProfile.gender,
+        latestProfile.height
+      );
+      return sanitizeProfile(standards);
+    }
   }
 
   @Get('trends')
@@ -94,7 +169,7 @@ export class ProfileController {
 
     // Note: Detailed trend analysis should be handled by AI module
     return {
-      currentProfile: profile,
+      currentProfile: sanitizeProfile(profile),
       trends: {
         weight: profile.weight,
         bodyFat: profile.bodyFatPercentage,
@@ -127,26 +202,34 @@ export class ProfileController {
     return {
       timeline: sortedProfiles.map(p => p.createdAt),
       datasets: {
+        height: sortedProfiles.map(p => p.height),
         weight: sortedProfiles.map(p => p.weight),
         bodyFat: sortedProfiles.map(p => p.bodyFatPercentage),
         muscleMass: sortedProfiles.map(p => p.skeletalMuscleMass),
         bmi: sortedProfiles.map(p => p.bmi),
         ffmi: sortedProfiles.map(p => p.ffmi),
-        visceralFat: sortedProfiles.map(p => p.visceralFatLevel)
+        visceralFat: sortedProfiles.map(p => p.visceralFatLevel ? Number(p.visceralFatLevel.toFixed(1)) : null),
+        totalBodyWater: sortedProfiles.map(p => p.totalBodyWater),
+        bmr: sortedProfiles.map(p => p.bmr),
+        tdee: sortedProfiles.map(p => p.tdee)
       },
       labels: sortedProfiles.map(p => {
         const date = new Date(p.createdAt);
         return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
       }),
       units: {
+        height: 'cm',
         weight: 'kg',
         bodyFat: '%',
         muscleMass: 'kg',
         bmi: '',
         ffmi: '',
-        visceralFat: ''
+        visceralFat: '',
+        totalBodyWater: 'L',
+        bmr: 'kcal',
+        tdee: 'kcal'
       },
-      latestProfile: sortedProfiles[sortedProfiles.length - 1],
+      latestProfile: sanitizeProfile(sortedProfiles[sortedProfiles.length - 1]),
       totalProfiles: sortedProfiles.length
     };
   }
@@ -156,12 +239,17 @@ export class ProfileController {
     summary: 'Lấy profile theo ID',
     description: 'Lấy chi tiết profile theo ID (chỉ có thể truy cập profile của chính mình)'
   })
-  @ApiResponse({ status: 200, description: 'Profile được tìm thấy' })
+  @ApiResponse({ 
+    status: 200, 
+    description: 'Profile được tìm thấy',
+    type: ProfileResponseDto
+  })
   @ApiResponse({ status: 404, description: 'Không tìm thấy profile' })
   @ApiResponse({ status: 401, description: 'Chưa xác thực' })
   @ApiResponse({ status: 403, description: 'Không có quyền truy cập' })
-  findOne(@Param('id') id: string, @Request() req) {
-    return this.profileService.findOne(+id, req.user.userId);
+  async findOne(@Param('id') id: string, @Request() req) {
+    const profile = await this.profileService.findOne(+id, req.user.userId);
+    return sanitizeProfile(profile);
   }
 
   @Patch(':id')
@@ -169,12 +257,17 @@ export class ProfileController {
     summary: 'Cập nhật profile theo ID',
     description: 'Cập nhật profile theo ID (bao gồm chỉ số Inbody)'
   })
-  @ApiResponse({ status: 200, description: 'Profile được cập nhật thành công' })
+  @ApiResponse({ 
+    status: 200, 
+    description: 'Profile được cập nhật thành công',
+    type: ProfileResponseDto
+  })
   @ApiResponse({ status: 404, description: 'Không tìm thấy profile' })
   @ApiResponse({ status: 401, description: 'Chưa xác thực' })
   @ApiResponse({ status: 403, description: 'Không có quyền cập nhật' })
-  update(@Param('id') id: string, @Body() updateProfileDto: UpdateProfileDto, @Request() req) {
-    return this.profileService.update(+id, updateProfileDto, req.user.userId);
+  async update(@Param('id') id: string, @Body() updateProfileDto: UpdateProfileDto, @Request() req) {
+    const profile = await this.profileService.update(+id, updateProfileDto, req.user.userId);
+    return sanitizeProfile(profile);
   }
 
   @Delete(':id')
