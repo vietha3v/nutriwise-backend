@@ -1,15 +1,32 @@
-import { IsString, IsEnum, IsDateString, IsOptional, IsNumber } from 'class-validator';
+import { IsString, IsEnum, IsDateString, IsOptional, IsNumber, IsArray, ValidateNested } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
 import { MealType } from '../../common/enums/role.enum';
 
-export class CreateMealDto {
+export class CreateMealFoodDto {
   @ApiProperty({
-    description: 'Name of the meal',
-    example: 'Breakfast'
+    description: 'Food ID',
+    example: 1
+  })
+  @IsNumber()
+  foodId: number;
+
+  @ApiProperty({
+    description: 'Quantity of the food',
+    example: 100
+  })
+  @IsNumber()
+  quantity: number;
+
+  @ApiProperty({
+    description: 'Unit of measurement',
+    example: 'g'
   })
   @IsString()
-  name: string;
+  unit: string;
+}
 
+export class CreateMealDto {
   @ApiProperty({
     enum: MealType,
     description: 'Type of meal',
@@ -33,38 +50,6 @@ export class CreateMealDto {
   time: string;
 
   @ApiProperty({
-    description: 'Total calories of the meal',
-    example: 450,
-    minimum: 0
-  })
-  @IsNumber()
-  totalCalories: number;
-
-  @ApiProperty({
-    description: 'Total protein in grams',
-    example: 25,
-    minimum: 0
-  })
-  @IsNumber()
-  totalProtein: number;
-
-  @ApiProperty({
-    description: 'Total carbohydrates in grams',
-    example: 60,
-    minimum: 0
-  })
-  @IsNumber()
-  totalCarbs: number;
-
-  @ApiProperty({
-    description: 'Total fat in grams',
-    example: 15,
-    minimum: 0
-  })
-  @IsNumber()
-  totalFat: number;
-
-  @ApiProperty({
     description: 'Notes about the meal',
     required: false,
     example: 'Healthy breakfast with eggs and whole grain bread'
@@ -74,9 +59,23 @@ export class CreateMealDto {
   notes?: string;
 
   @ApiProperty({
-    description: 'User ID',
-    example: 1
+    description: 'List of foods in the meal with quantities',
+    type: [CreateMealFoodDto],
+    example: [
+      {
+        foodId: 1,
+        quantity: 100,
+        unit: 'g'
+      },
+      {
+        foodId: 2,
+        quantity: 2,
+        unit: 'pieces'
+      }
+    ]
   })
-  @IsNumber()
-  userId: number;
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => CreateMealFoodDto)
+  mealFoods: CreateMealFoodDto[];
 } 

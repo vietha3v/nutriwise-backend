@@ -34,22 +34,32 @@ import { EmailModule } from '../email/email.module';
     {
       provide: 'LOGIN_GOOGLE_ENABLED',
       useFactory: (configService: ConfigService) => {
-        const enableGoogle = configService.get<boolean>('ENABLE_GOOGLE_OAUTH');
+        const enableGoogle = configService.get<string>('ENABLE_GOOGLE_OAUTH');
         const clientID = configService.get<string>('GOOGLE_CLIENT_ID');
         const clientSecret = configService.get<string>('GOOGLE_CLIENT_SECRET');
         const callbackURL = configService.get<string>('GOOGLE_CALLBACK_URL');
-        return enableGoogle === true && !!(clientID && clientSecret && callbackURL);
+        return enableGoogle === 'true' && !!(clientID && clientSecret && callbackURL);
       },
       inject: [ConfigService],
     },
     {
       provide: 'LOGIN_FB_ENABLED',
       useFactory: (configService: ConfigService) => {
-        const enableFacebook = configService.get<boolean>('ENABLE_FACEBOOK_OAUTH');
+        const enableFacebook = configService.get<string>('ENABLE_FACEBOOK_OAUTH');
         const clientID = configService.get<string>('FACEBOOK_CLIENT_ID');
         const clientSecret = configService.get<string>('FACEBOOK_CLIENT_SECRET');
         const callbackURL = configService.get<string>('FACEBOOK_CALLBACK_URL');
-        return enableFacebook === true && !!(clientID && clientSecret && callbackURL);
+        return enableFacebook === 'true' && !!(clientID && clientSecret && callbackURL);
+      },
+      inject: [ConfigService],
+    },
+    {
+      provide: 'LOGIN_ZALO_ENABLED',
+      useFactory: (configService: ConfigService) => {
+        const enableZalo = configService.get<string>('ENABLE_ZALO_OAUTH');
+        const clientID = configService.get<string>('ZALO_CLIENT_ID');
+        const clientSecret = configService.get<string>('ZALO_CLIENT_SECRET');
+        return enableZalo === 'true' && !!(clientID && clientSecret);
       },
       inject: [ConfigService],
     },

@@ -8,9 +8,11 @@ Hệ thống backend cho ứng dụng dinh dưỡng và sức khỏe NutriWise, 
 - **👥 Quản lý người dùng**: CRUD người dùng, thông tin cá nhân
 - **📊 Hồ sơ sức khỏe**: Quản lý profile, chỉ số Inbody, theo dõi tiến độ
 - **🍽️ Dinh dưỡng**: Quản lý bữa ăn, theo dõi nước, mục tiêu dinh dưỡng
+- **🥗 Quản lý thực phẩm**: CRUD thực phẩm, tìm kiếm, AI auto-generation
 - **💪 Tập luyện**: Ghi lại bài tập, tính calo đốt cháy
 - **📈 Dashboard**: Tổng quan, biểu đồ, báo cáo thống kê
 - **🤖 AI Personal Trainer**: Tạo kế hoạch dinh dưỡng và tập luyện tự động
+- **🤖 AI Food Recognition**: Tự động tạo thực phẩm mới bằng OpenAI
 - **📧 Email**: Hệ thống gửi email tự động
 - **👨‍💼 Trainer Marketplace**: Kết nối người dùng với huấn luyện viên
 - **💰 Wallet & Payment**: Ví điện tử, thanh toán, khuyến mại

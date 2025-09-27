@@ -6,48 +6,50 @@ import {
   UpdateDateColumn,
   ManyToOne,
   JoinColumn,
+  Index,
 } from 'typeorm';
-import { ApiProperty } from '@nestjs/swagger';
+import { User } from '../../user/entities/user.entity';
+import { Food } from './food.entity';
 
 @Entity('user_food_preferences')
+@Index(['userId', 'foodId'], { unique: true })
 export class UserFoodPreference {
-  @ApiProperty({ description: 'Unique identifier' })
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ApiProperty({ description: 'User ID' })
   @Column()
   userId: number;
 
-  @ApiProperty({ description: 'Food ID' })
   @Column()
   foodId: number;
 
-  @ApiProperty({ description: 'Mức độ yêu thích (1-5)' })
-  @Column({ type: 'integer', default: 3 })
-  preferenceLevel: number; // 1: không thích, 5: rất thích
+  @Column({ type: 'int', default: 3 })
+  preferenceLevel: number; // 1-5: 1=dislike, 3=neutral, 5=like
 
-  @ApiProperty({ description: 'Lý do không thích' })
   @Column({ type: 'text', nullable: true })
-  dislikeReason: string;
+  dislikeReason?: string;
 
-  @ApiProperty({ description: 'Dị ứng với thực phẩm này' })
-  @Column({ default: false })
+  @Column({ type: 'boolean', default: false })
   isAllergic: boolean;
 
-  @ApiProperty({ description: 'Thời gian tạo' })
-  @CreateDateColumn({ type: 'timestamp with time zone' })
+  @Column({ type: 'text', nullable: true })
+  allergicReaction?: string;
+
+  @Column({ type: 'text', nullable: true })
+  notes?: string;
+
+  @CreateDateColumn()
   createdAt: Date;
 
-  @ApiProperty({ description: 'Thời gian cập nhật' })
-  @UpdateDateColumn({ type: 'timestamp with time zone' })
+  @UpdateDateColumn()
   updatedAt: Date;
 
-  @ManyToOne('User', 'foodPreferences')
+  // Relations
+  @ManyToOne(() => User, (user) => user.foodPreferences)
   @JoinColumn({ name: 'userId' })
-  user: any;
+  user: User;
 
-  @ManyToOne('Food', 'userPreferences')
+  @ManyToOne(() => Food, (food) => food.userPreferences)
   @JoinColumn({ name: 'foodId' })
-  food: any;
+  food: Food;
 } 

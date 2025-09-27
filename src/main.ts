@@ -46,7 +46,7 @@ async function bootstrap() {
     .addTag('Profiles', 'User profile management')
     .addTag('Meals', 'Meal tracking and management')
     .addTag('Water', 'Water intake tracking')
-    .addTag('Exercise', 'Exercise tracking and management')
+    .addTag('Exercise', 'Exercise templates and sessions management')
     .addTag('Goals', 'Goal setting and tracking (nutrition, exercise, lifestyle)')
     .addTag('Dashboard', 'Analytics and reporting')
     .addTag('OAuth', 'Social login with Google and Facebook')

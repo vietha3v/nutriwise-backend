@@ -16,7 +16,8 @@ import { Profile } from './profile/entities/profile.entity';
 import { Meal } from './meal/entities/meal.entity';
 import { MealFood } from './meal/entities/meal-food.entity';
 import { WaterIntake } from './water/entities/water-intake.entity';
-import { Exercise } from './exercise/entities/exercise.entity';
+import { ExerciseTemplate } from './exercise/entities/exercise-template.entity';
+import { ExerciseSession } from './exercise/entities/exercise-session.entity';
 import { Goal } from './goals/entities/goal.entity';
 
 import { AiCache } from './ai-analysis/entities/ai-cache.entity';
@@ -24,8 +25,6 @@ import { UserPlatform } from './ai-assistant/entities/user-platform.entity';
 import { ChatMessage } from './ai-assistant/entities/chat-message.entity';
 import { Food } from './food/entities/food.entity';
 import { UserFoodPreference } from './food/entities/user-food-preference.entity';
-import { DailyFoodAvailability } from './food/entities/daily-food-availability.entity';
-import { MealSuggestion } from './food/entities/meal-suggestion.entity';
 import { UserSettings } from './settings/entities/user-settings.entity';
 
 // Feature modules
@@ -64,15 +63,14 @@ import { SettingsModule } from './settings/settings.module';
         Meal, 
         MealFood, 
         WaterIntake, 
-        Exercise, 
+        ExerciseTemplate,
+        ExerciseSession, 
         Goal,
         AiCache,
         UserPlatform,
         ChatMessage,
         Food,
         UserFoodPreference,
-        DailyFoodAvailability,
-        MealSuggestion,
         UserSettings,
       ],
       synchronize: true,

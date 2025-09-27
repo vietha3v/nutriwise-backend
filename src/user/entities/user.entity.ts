@@ -85,6 +85,14 @@ export class User {
   facebookId: string;
 
   @ApiProperty({ 
+    description: 'ID từ Zalo OAuth',
+    example: '1234567890123456789',
+    nullable: true
+  })
+  @Column({ nullable: true, unique: true })
+  zaloId: string;
+
+  @ApiProperty({ 
     description: 'URL ảnh đại diện',
     example: 'https://example.com/avatar.jpg',
     nullable: true
@@ -147,8 +155,8 @@ export class User {
   @OneToMany('WaterIntake', 'user')
   waterIntakes: any[];
 
-  @OneToMany('Exercise', 'user')
-  exercises: any[];
+  @OneToMany('ExerciseSession', 'user')
+  exerciseSessions: any[];
 
   @OneToMany('Goal', 'user')
   goals: any[];
@@ -163,9 +171,5 @@ export class User {
   @OneToMany('UserFoodPreference', 'user')
   foodPreferences: any[];
 
-  @OneToMany('DailyFoodAvailability', 'user')
-  dailyFoodAvailabilities: any[];
 
-  @OneToMany('MealSuggestion', 'user')
-  mealSuggestions: any[];
 } 

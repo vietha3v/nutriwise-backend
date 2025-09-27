@@ -8,17 +8,18 @@ import {
   Inject,
   UnauthorizedException,
   Res,
+  Req,
+  UseInterceptors,
+  ClassSerializerInterceptor,
 } from '@nestjs/common';
 import { Response } from 'express';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiBody } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
-import { RegisterDto } from './dto/register.dto';
-import { LoginDto } from './dto/login.dto';
 import { SocialLoginDto } from './dto/social-login.dto';
-import { ForgotPasswordDto } from './dto/forgot-password.dto';
-import { ResetPasswordDto } from './dto/reset-password.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { Public } from './decorators/public.decorator';
+import { AuthGuard } from '@nestjs/passport';
+import { Role } from '../common/enums/role.enum';
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -27,115 +28,19 @@ export class AuthController {
     private readonly authService: AuthService,
     @Inject('LOGIN_GOOGLE_ENABLED') private readonly loginGoogleEnabled: boolean,
     @Inject('LOGIN_FB_ENABLED') private readonly loginFbEnabled: boolean,
+    @Inject('LOGIN_ZALO_ENABLED') private readonly loginZaloEnabled: boolean,
   ) {}
 
-  @Public()
-  @Post('register')
-  @ApiOperation({ 
-    summary: 'Đăng ký tài khoản mới',
-    description: 'Cho phép người dùng tạo tài khoản mới với thông tin cơ bản. Hệ thống sẽ gửi email xác thực để kích hoạt tài khoản.'
-  })
-  @ApiBody({ 
-    type: RegisterDto,
-    description: 'Thông tin đăng ký tài khoản'
-  })
-  @ApiResponse({ 
-    status: 201, 
-    description: 'Đăng ký thành công. Tài khoản được tạo với vai trò mặc định là User.',
-    schema: {
-      example: {
-        id: 1,
-        username: 'john_doe',
-        email: 'john.doe@example.com',
-        role: 'User',
-        isVerified: false,
-        message: 'Vui lòng kiểm tra email để xác thực tài khoản'
-      }
-    }
-  })
-  @ApiResponse({ 
-    status: 400, 
-    description: 'Dữ liệu không hợp lệ',
-    schema: {
-      example: {
-        statusCode: 400,
-        message: ['username must be longer than or equal to 3 characters'],
-        error: 'Bad Request'
-      }
-    }
-  })
-  @ApiResponse({ 
-    status: 409, 
-    description: 'Username hoặc email đã tồn tại',
-    schema: {
-      example: {
-        statusCode: 409,
-        message: 'Username or email already exists',
-        error: 'Conflict'
-      }
-    }
-  })
-  register(@Body() registerDto: RegisterDto) {
-    return this.authService.register(registerDto);
-  }
+  // ===== OAUTH CALLBACK ROUTES REMOVED =====
+  // Các route OAuth callback cũ đã được xóa bỏ vì NextAuth tự quản lý OAuth flow
 
-  @Public()
-  @Post('login')
-  @ApiOperation({ 
-    summary: 'Đăng nhập bằng username/email và mật khẩu',
-    description: 'Xác thực người dùng và trả về JWT token để truy cập hệ thống.'
-  })
-  @ApiBody({ 
-    type: LoginDto,
-    description: 'Thông tin đăng nhập'
-  })
-  @ApiResponse({ 
-    status: 200, 
-    description: 'Đăng nhập thành công',
-    schema: {
-      example: {
-        access_token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
-        user: {
-          id: 1,
-          username: 'john_doe',
-          email: 'john.doe@example.com',
-          role: 'User',
-          displayName: 'John Doe',
-          profilePicture: 'https://example.com/avatar.jpg'
-        }
-      }
-    }
-  })
-  @ApiResponse({ 
-    status: 401, 
-    description: 'Thông tin đăng nhập không chính xác',
-    schema: {
-      example: {
-        statusCode: 401,
-        message: 'Invalid credentials',
-        error: 'Unauthorized'
-      }
-    }
-  })
-  async login(@Body() loginDto: LoginDto, @Res() res: Response) {
-    const result = await this.authService.login(loginDto);
-    
-    // Set refresh token vào HttpOnly cookie
-    if (result.refresh_token) {
-      res.cookie('refresh_token', result.refresh_token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'strict',
-        maxAge: parseInt(process.env.COOKIE_MAX_AGE || '0'), // 0 = không giới hạn
-        path: '/'
-      });
-    }
-    
-    return res.json({
-      token: result.token,
-      user: result.user
-    });
-  }
+  // ===== DIRECT OAUTH ENDPOINTS (for NextAuth integration) =====
+
+  // Đăng ký tài khoản thông thường đã bị vô hiệu hóa
+  // Chỉ hỗ trợ đăng nhập qua OAuth (Google, Facebook)
+
+  // Đăng nhập thông thường đã bị vô hiệu hóa
+  // Chỉ hỗ trợ đăng nhập qua OAuth (Google, Facebook)
 
   @Public()
   @Post('google')
@@ -157,7 +62,7 @@ export class AuthController {
           id: 1,
           username: 'john_doe',
           email: 'john.doe@gmail.com',
-          role: 'User',
+          role: Role.User,
           displayName: 'John Doe',
           profilePicture: 'https://lh3.googleusercontent.com/...',
           googleId: '123456789'
@@ -207,7 +112,7 @@ export class AuthController {
           id: 1,
           username: 'john_doe',
           email: 'john.doe@facebook.com',
-          role: 'User',
+          role: Role.User,
           displayName: 'John Doe',
           profilePicture: 'https://graph.facebook.com/...',
           facebookId: '123456789'
@@ -238,65 +143,57 @@ export class AuthController {
   }
 
   @Public()
-  @Post('forgot-password')
+  @Post('zalo')
   @ApiOperation({ 
-    summary: 'Gửi email reset mật khẩu',
-    description: 'Gửi email chứa link reset mật khẩu đến địa chỉ email đã đăng ký.'
+    summary: 'Đăng nhập bằng Zalo OAuth',
+    description: 'Đăng nhập bằng tài khoản Zalo. Nếu tài khoản chưa tồn tại, hệ thống sẽ tạo tài khoản mới.'
   })
   @ApiBody({ 
-    type: ForgotPasswordDto,
-    description: 'Email cần reset mật khẩu'
+    type: SocialLoginDto,
+    description: 'Thông tin từ Zalo OAuth'
   })
   @ApiResponse({ 
     status: 200, 
-    description: 'Email reset mật khẩu đã được gửi (nếu tài khoản tồn tại)',
+    description: 'Đăng nhập Zalo thành công',
     schema: {
       example: {
-        message: 'Nếu email tồn tại trong hệ thống, bạn sẽ nhận được email reset mật khẩu trong vài phút.'
+        access_token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
+        user: {
+          id: 1,
+          username: 'john_doe',
+          email: 'john.doe@zalo.me',
+          role: Role.User,
+          displayName: 'John Doe',
+          profilePicture: 'https://s120-ava-talk.zadn.vn/...',
+          zaloId: '1234567890123456789'
+        }
       }
     }
   })
   @ApiResponse({ 
     status: 400, 
-    description: 'Email không hợp lệ'
+    description: 'Dữ liệu OAuth không hợp lệ'
   })
-  forgotPassword(@Body() forgotPasswordDto: ForgotPasswordDto) {
-    return this.authService.forgotPassword(forgotPasswordDto);
+  @ApiResponse({ 
+    status: 503, 
+    description: 'Zalo OAuth chưa được cấu hình',
+    schema: {
+      example: {
+        statusCode: 503,
+        message: 'Zalo OAuth is not configured',
+        error: 'Service Unavailable'
+      }
+    }
+  })
+  zaloLogin(@Body() socialLoginDto: SocialLoginDto) {
+    if (!this.loginZaloEnabled) {
+      throw new Error('Zalo OAuth is not configured. Please set ZALO_CLIENT_ID and ZALO_CLIENT_SECRET in your environment variables.');
+    }
+    return this.authService.socialLogin(socialLoginDto, 'zalo');
   }
 
-  @Public()
-  @Post('reset-password')
-  @ApiOperation({ 
-    summary: 'Đặt lại mật khẩu với token',
-    description: 'Đặt lại mật khẩu mới bằng token từ email.'
-  })
-  @ApiBody({ 
-    type: ResetPasswordDto,
-    description: 'Token và mật khẩu mới'
-  })
-  @ApiResponse({ 
-    status: 200, 
-    description: 'Mật khẩu đã được đặt lại thành công',
-    schema: {
-      example: {
-        message: 'Mật khẩu đã được đặt lại thành công. Vui lòng đăng nhập lại.'
-      }
-    }
-  })
-  @ApiResponse({ 
-    status: 401, 
-    description: 'Token không hợp lệ hoặc đã hết hạn',
-    schema: {
-      example: {
-        statusCode: 401,
-        message: 'Invalid or expired token',
-        error: 'Unauthorized'
-      }
-    }
-  })
-  resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
-    return this.authService.resetPassword(resetPasswordDto);
-  }
+  // Chức năng quên mật khẩu và reset mật khẩu đã bị vô hiệu hóa
+  // Vì chỉ sử dụng OAuth, không cần mật khẩu
 
   @UseGuards(JwtAuthGuard)
   @Get('profile')
@@ -312,7 +209,7 @@ export class AuthController {
         id: 1,
         username: 'john_doe',
         email: 'john.doe@example.com',
-        role: 'User',
+        role: Role.User,
         displayName: 'John Doe',
         profilePicture: 'https://example.com/avatar.jpg',
         isVerified: true,
@@ -350,98 +247,15 @@ export class AuthController {
     return {
       google: this.loginGoogleEnabled,
       facebook: this.loginFbEnabled,
+      zalo: this.loginZaloEnabled,
     };
   }
 
-  @Public()
-  @Post('refresh-token')
-  @ApiOperation({ 
-    summary: 'Làm mới JWT token',
-    description: 'Tạo JWT token mới dựa trên refresh token.'
-  })
-  @ApiResponse({ 
-    status: 200, 
-    description: 'Token mới được tạo thành công',
-    schema: {
-      example: {
-        token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
-        user: {
-          id: 1,
-          username: 'john_doe',
-          email: 'john.doe@example.com',
-          role: 'User',
-          isVerified: true
-        }
-      }
-    }
-  })
-  @ApiResponse({ 
-    status: 401, 
-    description: 'Refresh token không hợp lệ'
-  })
-  async refreshToken(@Request() req, @Res() res: Response) {
-    // Lấy refresh token từ HttpOnly cookie
-    const refreshToken = req.cookies?.refresh_token;
-    if (!refreshToken) {
-      throw new UnauthorizedException('Refresh token not provided');
-    }
-    
-    const result = await this.authService.refreshToken(refreshToken);
-    
-    // Set refresh token mới vào HttpOnly cookie
-    if (result.refresh_token) {
-      res.cookie('refresh_token', result.refresh_token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'strict',
-        maxAge: parseInt(process.env.COOKIE_MAX_AGE || '0'), // 0 = không giới hạn
-        path: '/'
-      });
-    }
-    
-    // Chỉ trả về access token và user info
-    return res.json({
-      token: result.token,
-      user: result.user
-    });
-  }
 
-  @UseGuards(JwtAuthGuard)
-  @Post('logout')
-  @ApiOperation({ 
-    summary: 'Đăng xuất',
-    description: 'Xóa token và refresh token, đăng xuất người dùng.'
-  })
-  @ApiResponse({ 
-    status: 200, 
-    description: 'Đăng xuất thành công',
-    schema: {
-      example: {
-        message: 'Đăng xuất thành công'
-      }
-    }
-  })
-  @ApiResponse({ 
-    status: 401, 
-    description: 'Chưa đăng nhập'
-  })
-  @ApiBearerAuth()
-  logout(@Res() res: Response) {
-    // Xóa refresh token cookie
-    res.clearCookie('refresh_token', {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      path: '/'
-    });
-    
-    // Xóa access token cookie nếu có
-    res.clearCookie('token', {
-      httpOnly: false,
-      sameSite: 'lax',
-      path: '/'
-    });
-    
-    return res.json({ message: 'Đăng xuất thành công' });
-  }
+
+  // ===== DUPLICATE GOOGLE CALLBACK REMOVED =====
+  // Route Google callback trùng lặp đã được xóa bỏ
+
+  // ===== REFRESH TOKEN & LOGOUT ROUTES REMOVED =====
+  // Các route refresh-token và logout cũ đã được xóa bỏ vì NextAuth tự quản lý session
 } 

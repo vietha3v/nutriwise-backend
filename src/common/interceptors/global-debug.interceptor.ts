@@ -7,6 +7,20 @@ import {
 import { Observable } from 'rxjs';
 import { tap, catchError } from 'rxjs/operators';
 
+// Helper function to safely serialize objects with circular references
+function safeStringify(obj: any, space?: number): string {
+  const seen = new WeakSet();
+  return JSON.stringify(obj, (key, value) => {
+    if (typeof value === 'object' && value !== null) {
+      if (seen.has(value)) {
+        return '[Circular Reference]';
+      }
+      seen.add(value);
+    }
+    return value;
+  }, space);
+}
+
 @Injectable()
 export class GlobalDebugInterceptor implements NestInterceptor {
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
@@ -26,9 +40,9 @@ export class GlobalDebugInterceptor implements NestInterceptor {
     console.log(`Method: ${method}`);
     console.log(`URL: ${url}`);
     console.log(`Timestamp: ${new Date().toISOString()}`);
-    console.log(`Body:`, JSON.stringify(body, null, 2));
-    console.log(`Headers:`, JSON.stringify(headers, null, 2));
-    console.log(`Params:`, JSON.stringify({ ...params, ...query }, null, 2));
+    console.log(`Body:`, safeStringify(body, 2));
+    console.log(`Headers:`, safeStringify(headers, 2));
+    console.log(`Params:`, safeStringify({ ...params, ...query }, 2));
     console.log('=====================\n');
 
     return next.handle().pipe(
@@ -40,7 +54,7 @@ export class GlobalDebugInterceptor implements NestInterceptor {
         console.log('\n=== RESPONSE DEBUG ===');
         console.log(`Status Code: ${statusCode}`);
         console.log(`Duration: ${duration}ms`);
-        console.log('Response:', JSON.stringify(data, null, 2));
+        console.log('Response:', safeStringify(data, 2));
         console.log('======================\n');
       }),
       catchError((error) => {
@@ -51,11 +65,11 @@ export class GlobalDebugInterceptor implements NestInterceptor {
         console.log('\n=== ERROR DEBUG ===');
         console.log(`Status Code: ${statusCode}`);
         console.log(`Duration: ${duration}ms`);
-        console.log('Error:', JSON.stringify({
+        console.log('Error:', safeStringify({
           message: error.message,
           statusCode: error.status,
           stack: error.stack
-        }, null, 2));
+        }, 2));
         console.log('==================\n');
         
         throw error;

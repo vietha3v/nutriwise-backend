@@ -237,7 +237,6 @@ Thời gian = Ngày tạo profile mới - Ngày tạo profile cũ
   };
   mealHistory?: Meal[];            // Lịch sử ăn uống (nếu có)
   preferences?: {
-    dietaryRestrictions?: string[]; // Hạn chế ăn uống
     foodPreferences?: string[];    // Sở thích ăn uống
     allergies?: string[];          // Dị ứng thực phẩm
   };

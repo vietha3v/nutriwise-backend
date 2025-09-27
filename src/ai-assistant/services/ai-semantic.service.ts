@@ -1,5 +1,19 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+
+// Helper function to safely serialize objects with circular references
+function safeStringify(obj: any, space?: number): string {
+  const seen = new WeakSet();
+  return JSON.stringify(obj, (key, value) => {
+    if (typeof value === 'object' && value !== null) {
+      if (seen.has(value)) {
+        return '[Circular Reference]';
+      }
+      seen.add(value);
+    }
+    return value;
+  }, space);
+}
 import { AIActionRequestDto, AIActionResponseDto, MediaType } from '../dto/ai-action.dto';
 import { AI_ACTIONS, getActionByName } from '../config/ai-actions.config';
 import { MediaDetectionService } from './media-detection.service';
@@ -114,9 +128,9 @@ Nhiệm vụ: Phân tích tin nhắn của người dùng và xác định:
 3. Thông tin còn thiếu (missingParams)
 4. Câu hỏi thông minh để thu thập thông tin (smartQuestions)
 
-Context hiện tại: ${JSON.stringify(context || {})}
+Context hiện tại: ${safeStringify(context || {})}
 
-${mediaAnalysis ? `Phân tích media: ${JSON.stringify(mediaAnalysis)}` : ''}
+${mediaAnalysis ? `Phân tích media: ${safeStringify(mediaAnalysis)}` : ''}
 
 Tin nhắn người dùng: "${message}"
 
@@ -171,7 +185,7 @@ Nếu không phải action nào, trả về:
           'Authorization': `Bearer ${this.openaiApiKey}`,
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(requestBody),
+        body: safeStringify(requestBody),
       });
 
       if (!response.ok) {

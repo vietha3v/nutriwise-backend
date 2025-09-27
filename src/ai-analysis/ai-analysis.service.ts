@@ -2,6 +2,20 @@ import { Injectable, Logger, Inject, forwardRef } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ConfigService } from '@nestjs/config';
+
+// Helper function to safely serialize objects with circular references
+function safeStringify(obj: any, space?: number): string {
+  const seen = new WeakSet();
+  return JSON.stringify(obj, (key, value) => {
+    if (typeof value === 'object' && value !== null) {
+      if (seen.has(value)) {
+        return '[Circular Reference]';
+      }
+      seen.add(value);
+    }
+    return value;
+  }, space);
+}
 import { AiCache } from './entities/ai-cache.entity';
 import { WaterService } from '../water/water.service';
 import { ProfileService } from '../profile/profile.service';
@@ -399,7 +413,7 @@ export class AiAnalysisService {
       const costUsd = this.calculateCost(tokensUsed, this.aiConfig.model);
 
       // Log input và output
-      this.logger.log(`OpenAI Input: ${JSON.stringify(data, null, 2)}`);
+      this.logger.log(`OpenAI Input: ${safeStringify(data, 2)}`);
       this.logger.log(`OpenAI Output: ${response}`);
 
       return {
@@ -546,7 +560,7 @@ Bao gồm:
         return `Dựa trên thông tin profile sức khỏe của người dùng, hãy đánh giá và tư vấn như một chuyên gia sức khỏe:
 
 **Thông tin profile:**
-${JSON.stringify(data.profile, null, 2)}
+${safeStringify(data.profile, 2)}
 
 Hãy đưa ra đánh giá chuyên môn, phân tích tình trạng sức khỏe và khuyến nghị cụ thể. Viết như đang khám và tư vấn trực tiếp.`;
 
@@ -554,7 +568,7 @@ Hãy đưa ra đánh giá chuyên môn, phân tích tình trạng sức khỏe v
         return `Dựa trên thông tin profile sức khỏe của người dùng, hãy tính toán các chỉ số lý tưởng:
 
 **Thông tin profile:**
-${JSON.stringify(data.profile, null, 2)}
+${safeStringify(data.profile, 2)}
 
 Hãy tính toán các chỉ số lý tưởng dựa trên tuổi, giới tính, chiều cao, mức độ hoạt động và mục tiêu của người dùng. Trả về kết quả dưới dạng JSON với cấu trúc chính xác như đã mô tả.`;
 
@@ -564,13 +578,13 @@ Hãy tính toán các chỉ số lý tưởng dựa trên tuổi, giới tính, 
 **Dữ liệu phân tích:**
 - Thời gian: ${data.period}
 - Loại phân tích: ${data.analysisType}
-- Dữ liệu nước: ${JSON.stringify(data.waterStats, null, 2)}
-- Thông tin cá nhân: ${JSON.stringify(data.profile, null, 2)}
+- Dữ liệu nước: ${safeStringify(data.waterStats, 2)}
+- Thông tin cá nhân: ${safeStringify(data.profile, 2)}
 
 Hãy tạo một bài phân tích chuyên sâu về tác động của hydration lên sức khỏe, bao gồm bằng chứng khoa học và khuyến nghị thực tế.`;
 
       default:
-        return `Phân tích dữ liệu sức khỏe: ${JSON.stringify(data, null, 2)}
+        return `Phân tích dữ liệu sức khỏe: ${safeStringify(data, 2)}
 
 Hãy đưa ra lời khuyên chuyên môn dưới dạng văn bản tự nhiên.`;
     }
@@ -600,7 +614,7 @@ Hãy đưa ra lời khuyên chuyên môn dưới dạng văn bản tự nhiên.`
       });
 
       const totalEntries = cacheEntries.length;
-      const totalSize = cacheEntries.reduce((sum, entry) => sum + (JSON.stringify(entry.responseData)?.length || 0), 0);
+      const totalSize = cacheEntries.reduce((sum, entry) => sum + (safeStringify(entry.responseData)?.length || 0), 0);
 
       return {
         totalEntries,
@@ -610,7 +624,7 @@ Hãy đưa ra lời khuyên chuyên môn dưới dạng văn bản tự nhiên.`
           id: entry.id,
           requestType: entry.requestType,
           createdAt: entry.createdAt,
-          size: JSON.stringify(entry.responseData)?.length || 0
+          size: safeStringify(entry.responseData)?.length || 0
         }))
       };
     } catch (error) {

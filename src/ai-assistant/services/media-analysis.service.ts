@@ -1,5 +1,19 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+
+// Helper function to safely serialize objects with circular references
+function safeStringify(obj: any, space?: number): string {
+  const seen = new WeakSet();
+  return JSON.stringify(obj, (key, value) => {
+    if (typeof value === 'object' && value !== null) {
+      if (seen.has(value)) {
+        return '[Circular Reference]';
+      }
+      seen.add(value);
+    }
+    return value;
+  }, space);
+}
 import { MediaType } from '../dto/ai-action.dto';
 
 @Injectable()
@@ -80,7 +94,7 @@ export class MediaAnalysisService {
         headers: {
           'Authorization': `Bearer ${this.openaiApiKey}`,
         },
-        body: JSON.stringify({
+        body: safeStringify({
           file: audioUrl,
           model: this.openaiWhisperModel,
           language: 'vi', // Vietnamese
@@ -112,7 +126,7 @@ export class MediaAnalysisService {
           'Authorization': `Bearer ${this.openaiApiKey}`,
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
+        body: safeStringify({
           model: 'gpt-3.5-turbo',
           messages: [
             {
@@ -167,7 +181,7 @@ export class MediaAnalysisService {
           'Authorization': `Bearer ${this.openaiApiKey}`,
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
+        body: safeStringify({
           model: this.openaiVisionModel,
           messages: [
             {
@@ -221,7 +235,7 @@ export class MediaAnalysisService {
           'Authorization': `Bearer ${this.openaiApiKey}`,
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
+        body: safeStringify({
           model: 'gpt-3.5-turbo',
           messages: [
             {

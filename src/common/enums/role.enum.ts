@@ -34,17 +34,4 @@ export enum MealType {
   Snack = 'Snack',
 }
 
-export enum ExerciseType {
-  Cardio = 'Cardio',
-  Strength = 'Strength',
-  Flexibility = 'Flexibility',
-  Balance = 'Balance',
-  Sports = 'Sports',
-  Yoga = 'Yoga',
-  Pilates = 'Pilates',
-  Swimming = 'Swimming',
-  Running = 'Running',
-  Cycling = 'Cycling',
-  Walking = 'Walking',
-  Other = 'Other',
-} 
+// ExerciseType moved to exercise-template.entity.ts 

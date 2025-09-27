@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Between } from 'typeorm';
 import { Meal } from '../meal/entities/meal.entity';
 import { WaterIntake } from '../water/entities/water-intake.entity';
-import { Exercise } from '../exercise/entities/exercise.entity';
+import { ExerciseSession } from '../exercise/entities/exercise-session.entity';
 import { Goal, GoalStatus } from '../goals/entities/goal.entity';
 
 @Injectable()
@@ -13,8 +13,8 @@ export class DashboardService {
     private mealRepository: Repository<Meal>,
     @InjectRepository(WaterIntake)
     private waterIntakeRepository: Repository<WaterIntake>,
-    @InjectRepository(Exercise)
-    private exerciseRepository: Repository<Exercise>,
+    @InjectRepository(ExerciseSession)
+    private exerciseSessionRepository: Repository<ExerciseSession>,
     @InjectRepository(Goal)
     private goalRepository: Repository<Goal>,
   ) {}
@@ -43,11 +43,10 @@ export class DashboardService {
     });
 
     // Get today's exercise data
-    const todayExercises = await this.exerciseRepository.find({
+    const todayExercises = await this.exerciseSessionRepository.find({
       where: {
         userId,
-        date: today,
-        isDeleted: false,
+        startedAt: Between(startOfDay, endOfDay),
       },
     });
 
@@ -67,7 +66,7 @@ export class DashboardService {
     const totalFatConsumed = todayMeals.reduce((sum, meal) => sum + meal.totalFat, 0);
 
     // Calculate total calories burned today
-    const totalCaloriesBurned = todayExercises.reduce((sum, exercise) => sum + exercise.caloriesBurned, 0);
+    const totalCaloriesBurned = todayExercises.reduce((sum, session) => sum + session.caloriesBurned, 0);
 
     // Calculate total water intake today
     const totalWaterIntake = todayWaterIntake.reduce((sum, water) => sum + water.amount, 0);
@@ -80,7 +79,7 @@ export class DashboardService {
         date: today,
         meals: todayMeals,
         waterIntake: todayWaterIntake,
-        exercises: todayExercises,
+        exerciseSessions: todayExercises,
         nutrition: {
           caloriesConsumed: totalCaloriesConsumed,
           caloriesBurned: totalCaloriesBurned,
@@ -129,11 +128,10 @@ export class DashboardService {
       },
     });
 
-    const weeklyExercises = await this.exerciseRepository.find({
+    const weeklyExercises = await this.exerciseSessionRepository.find({
       where: {
         userId,
-        date: Between(weekAgo, today),
-        isDeleted: false,
+        startedAt: Between(weekAgo, today),
       },
     });
 
@@ -147,7 +145,7 @@ export class DashboardService {
 
     // Calculate average daily values
     const avgDailyCalories = weeklyMeals.reduce((sum, meal) => sum + meal.totalCalories, 0) / 7;
-    const avgDailyCaloriesBurned = weeklyExercises.reduce((sum, ex) => sum + ex.caloriesBurned, 0) / 7;
+    const avgDailyCaloriesBurned = weeklyExercises.reduce((sum, session) => sum + session.caloriesBurned, 0) / 7;
     const avgDailyWaterIntake = weeklyWaterIntake.reduce((sum, water) => sum + water.amount, 0) / 7;
 
     return {
@@ -163,7 +161,7 @@ export class DashboardService {
       },
       totals: {
         totalMeals: weeklyMeals.length,
-        totalExercises: weeklyExercises.length,
+        totalExerciseSessions: weeklyExercises.length,
         totalWaterIntake: weeklyWaterIntake.reduce((sum, water) => sum + water.amount, 0),
       },
     };

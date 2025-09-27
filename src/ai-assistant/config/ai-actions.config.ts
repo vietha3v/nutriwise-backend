@@ -17,8 +17,7 @@ export const AI_ACTIONS: ActionDefinition[] = [
       { name: 'birthDate', type: 'date', description: 'Ngày sinh', required: false },
       { name: 'targetWeight', type: 'number', description: 'Cân nặng mục tiêu', required: false },
       { name: 'medicalConditions', type: 'array', description: 'Tình trạng sức khỏe', required: false },
-      { name: 'allergies', type: 'array', description: 'Dị ứng thực phẩm', required: false },
-      { name: 'dietaryRestrictions', type: 'array', description: 'Hạn chế ăn uống', required: false }
+      { name: 'allergies', type: 'array', description: 'Dị ứng thực phẩm', required: false }
     ],
     confirmationRequired: true
   },
@@ -261,7 +260,6 @@ export const AI_ACTIONS: ActionDefinition[] = [
       { name: 'calorieRange', type: 'object', description: 'Khoảng calo {min, max}', required: false },
       { name: 'proteinRange', type: 'object', description: 'Khoảng protein {min, max}', required: false },
       { name: 'allergenFree', type: 'array', description: 'Loại trừ dị ứng', required: false },
-      { name: 'dietaryRestrictions', type: 'array', description: 'Hạn chế ăn uống', required: false },
       { name: 'sortBy', type: 'enum', description: 'Sắp xếp theo (name|calories|protein|popularity)', required: false }
     ],
     confirmationRequired: false
@@ -298,7 +296,6 @@ export const AI_ACTIONS: ActionDefinition[] = [
       { name: 'activityLevel', type: 'enum', description: 'Mức độ hoạt động (sedentary|light|moderate|active|very_active)', required: false },
       { name: 'healthConditions', type: 'array', description: 'Tình trạng sức khỏe', required: false },
       { name: 'allergies', type: 'array', description: 'Dị ứng', required: false },
-      { name: 'dietaryRestrictions', type: 'array', description: 'Hạn chế ăn uống', required: false },
       { name: 'currentWeight', type: 'number', description: 'Cân nặng hiện tại', required: false },
       { name: 'targetWeight', type: 'number', description: 'Cân nặng mục tiêu', required: false },
       { name: 'lifestyle', type: 'enum', description: 'Lối sống (busy|moderate|relaxed)', required: false },

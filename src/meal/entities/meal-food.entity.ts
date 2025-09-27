@@ -7,6 +7,7 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
+import { Food } from '../../food/entities/food.entity';
 
 @Entity('meal_foods')
 export class MealFood {
@@ -64,4 +65,11 @@ export class MealFood {
 
   @Column()
   mealId: number;
+
+  @Column({ nullable: true })
+  foodId: number;
+
+  @ManyToOne(() => Food, { nullable: true })
+  @JoinColumn({ name: 'foodId' })
+  food: Food;
 } 
